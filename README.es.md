@@ -114,7 +114,7 @@ superficie pública.
 
 Node.js `^20.0.0 || ^22.0.0 || >=24.0.0`, o un bundler moderno para
 navegador. El paquete se publica solo como ESM (`"type": "module"`, sin
-build de CommonJS) — `require('archi-model-parser')` no está soportado.
+build de CommonJS) — `require('@continuousarchitecture/archi-model-parser')` no está soportado.
 
 ## Desarrollo
 
