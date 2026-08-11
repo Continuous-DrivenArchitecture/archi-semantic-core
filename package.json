@@ -1,5 +1,5 @@
 {
-  "name": "archi-model-parser",
+  "name": "@continuousarchitecture/archi-model-parser",
   "version": "0.1.0",
   "description": "Parse Archi desktop editor's native .archimate XML files into a clean, well-typed TypeScript domain model.",
   "keywords": [
