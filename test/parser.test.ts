@@ -6,12 +6,21 @@ describe('parseArchiModel — minimal model', () => {
   const model = parseArchiModel(loadFixture('minimal.archimate'));
 
   it('reads model metadata', () => {
-    expect(model.metadata).toEqual({ id: 'model-minimal', name: 'Minimal Model', version: '5.0.0' });
+    expect(model.metadata).toEqual({ id: 'model-minimal', name: 'Minimal Model', version: '5.0.0', purpose: null, properties: [] });
   });
 
   it('reads the one folder and its contained element', () => {
     expect(model.folders).toEqual([
-      { id: 'folder-business', name: 'Business', type: 'business', parentId: null, path: 'Business', containedIds: ['element-customer'] },
+      {
+        id: 'folder-business',
+        name: 'Business',
+        type: 'business',
+        parentId: null,
+        path: 'Business',
+        containedIds: ['element-customer'],
+        documentation: null,
+        properties: [],
+      },
     ]);
   });
 
@@ -53,6 +62,8 @@ describe('parseArchiModel — empty folders (bug fix: CA-Stack silently dropped 
       parentId: null,
       path: 'Empty root',
       containedIds: [],
+      documentation: null,
+      properties: [],
     });
     expect(byId.get('folder-child-empty')).toEqual({
       id: 'folder-child-empty',
@@ -61,6 +72,8 @@ describe('parseArchiModel — empty folders (bug fix: CA-Stack silently dropped 
       parentId: 'folder-parent',
       path: 'Parent/Empty child',
       containedIds: [],
+      documentation: null,
+      properties: [],
     });
   });
 });
@@ -84,6 +97,42 @@ describe('parseArchiModel — relationship types', () => {
   it('never fabricates a placeholder name for unnamed relationships', () => {
     const unnamed = model.relationships.filter((rel) => rel.name === null);
     expect(unnamed).toHaveLength(5);
+  });
+});
+
+describe('parseArchiModel — relationship-specific attributes (accessType, strength, directed)', () => {
+  const model = parseArchiModel(loadFixture('relationship-attributes.archimate'));
+  const byId = new Map(model.relationships.map((rel) => [rel.id, rel]));
+
+  it('decodes AccessRelationship accessType, defaulting an absent attribute to Write (Archi\'s own documented default)', () => {
+    expect(byId.get('access-absent')?.accessType).toBe('Write');
+    expect(byId.get('access-write')?.accessType).toBe('Write');
+    expect(byId.get('access-read')?.accessType).toBe('Read');
+    expect(byId.get('access-unspecified')?.accessType).toBe('Unspecified');
+    expect(byId.get('access-readwrite')?.accessType).toBe('ReadWrite');
+  });
+
+  it('leaves accessType null for every relationship type other than AccessRelationship', () => {
+    expect(byId.get('influence-with-strength')?.accessType).toBeNull();
+    expect(byId.get('association-directed')?.accessType).toBeNull();
+  });
+
+  it('reads InfluenceRelationship strength, leaving it null (not a fabricated default) when blank/absent', () => {
+    expect(byId.get('influence-with-strength')?.strength).toBe('+');
+    expect(byId.get('influence-absent')?.strength).toBeNull();
+  });
+
+  it('leaves strength null for every relationship type other than InfluenceRelationship', () => {
+    expect(byId.get('access-write')?.strength).toBeNull();
+  });
+
+  it('decodes AssociationRelationship directed, defaulting an absent attribute to false', () => {
+    expect(byId.get('association-directed')?.directed).toBe(true);
+    expect(byId.get('association-absent')?.directed).toBe(false);
+  });
+
+  it('leaves directed null for every relationship type other than AssociationRelationship', () => {
+    expect(byId.get('access-write')?.directed).toBeNull();
   });
 });
 
@@ -158,6 +207,32 @@ describe('parseArchiModel — documentation, properties, and Group containers', 
     const relationship = model.relationships.find((rel) => rel.id === 'relationship-serving')!;
     expect(relationship.documentation).toBe('Relationship documentation');
     expect(relationship.properties).toEqual([{ key: 'Order', value: '1' }]);
+  });
+
+  it('reads the model root purpose (decoding numeric character references the same way as documentation) and properties', () => {
+    expect(model.metadata.purpose).toBe('Model purpose\r\nSecond line');
+    expect(model.metadata.properties).toEqual([{ key: 'ModelOwner', value: 'Architecture Team' }]);
+  });
+
+  it('reads folder documentation and properties', () => {
+    const folder = model.folders.find((f) => f.id === 'folder-app')!;
+    expect(folder.documentation).toBe('Application folder documentation');
+    expect(folder.properties).toEqual([{ key: 'FolderOwner', value: 'App Team' }]);
+  });
+
+  it('reads a view viewpoint code verbatim, without decoding it to a human-readable name', () => {
+    const view = model.views.find((v) => v.id === 'view-details')!;
+    expect(view.viewpoint).toBe('layered');
+  });
+
+  it('reads a DiagramModelReference node\'s referencedModelId, distinguishing it from a Group', () => {
+    const modelRef = model.diagramObjects.find((obj) => obj.id === 'visual-modelref')!;
+    expect(modelRef.xsiType).toBe('archimate:DiagramModelReference');
+    expect(modelRef.archimateElementId).toBeNull();
+    expect(modelRef.referencedModelId).toBe('view-other');
+
+    const group = model.diagramObjects.find((obj) => obj.id === 'visual-group')!;
+    expect(group.referencedModelId).toBeNull();
   });
 
   it('preserves a Group visual container instead of silently dropping it (bug fix)', () => {

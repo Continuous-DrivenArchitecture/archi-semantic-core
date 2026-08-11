@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<archimate:model xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:archimate="http://www.archimatetool.com/archimate" name="Relationship Attributes" id="model-relationship-attributes" version="5.0.0">
+  <folder name="Application" id="folder-app" type="application">
+    <element xsi:type="archimate:ApplicationComponent" name="Source" id="element-source"/>
+    <element xsi:type="archimate:ApplicationComponent" name="Target" id="element-target"/>
+  </folder>
+  <folder name="Relations" id="folder-rel" type="relations">
+    <element xsi:type="archimate:AccessRelationship" id="access-absent" source="element-source" target="element-target"/>
+    <element xsi:type="archimate:AccessRelationship" id="access-write" source="element-source" target="element-target" accessType="0"/>
+    <element xsi:type="archimate:AccessRelationship" id="access-read" source="element-source" target="element-target" accessType="1"/>
+    <element xsi:type="archimate:AccessRelationship" id="access-unspecified" source="element-source" target="element-target" accessType="2"/>
+    <element xsi:type="archimate:AccessRelationship" id="access-readwrite" source="element-source" target="element-target" accessType="3"/>
+    <element xsi:type="archimate:InfluenceRelationship" id="influence-with-strength" source="element-source" target="element-target" strength="+"/>
+    <element xsi:type="archimate:InfluenceRelationship" id="influence-absent" source="element-source" target="element-target"/>
+    <element xsi:type="archimate:AssociationRelationship" id="association-directed" source="element-source" target="element-target" directed="true"/>
+    <element xsi:type="archimate:AssociationRelationship" id="association-absent" source="element-source" target="element-target"/>
+  </folder>
+</archimate:model>

@@ -68,7 +68,7 @@ desde el navegador o pruebas (tests).
   empresarial — un modelo puede validar correctamente y aun así ser una
   mala arquitectura.
 - Tipos: `ArchiModel`, `ArchiModelMetadata`, `ArchiFolder`, `ArchiElement`,
-  `ArchiRelationship`, `ArchiView`, `ArchiDiagramObject`,
+  `ArchiRelationship`, `ArchiAccessType`, `ArchiView`, `ArchiDiagramObject`,
   `ArchiDiagramConnection`, `ArchiNote`, `ArchiBounds`, `ArchiBendpoint`,
   `ArchiProperty`, `ArchiValidationResult`, `ArchiValidationIssue`.
 
@@ -87,11 +87,34 @@ superficie pública.
 
 ## Qué cubre
 
-- Metadatos del modelo (id, name, version)
-- Carpetas (folders), incluidas las vacías, con jerarquía padre/hijo y path
+- Metadatos del modelo (id, name, version, `purpose` y propiedades a nivel
+  de modelo)
+- Carpetas (folders), incluidas las vacías, con jerarquía padre/hijo, path,
+  documentación y propiedades
 - Elementos y relaciones de ArchiMate de cualquier tipo, de forma genérica
+- Atributos nativos específicos de cada tipo de relación:
+  - `AccessRelationship.accessType` — `'Write' | 'Read' | 'Unspecified' | 'ReadWrite'`,
+    decodificado desde la codificación nativa `0`-`3` de Archi. Es `null`
+    para cualquier otro tipo de relación; siempre se resuelve a un valor
+    (por defecto `'Write'`, el valor por defecto documentado por el propio
+    Archi) cuando la relación es una `AccessRelationship` — que el atributo
+    esté textualmente ausente no es lo mismo que estar "sin definir".
+  - `InfluenceRelationship.strength` — el modificador de texto libre (p. ej.
+    `"+"`). Es `null` para cualquier otro tipo de relación, y también
+    `null` cuando está en blanco o ausente (aquí no existe un valor por
+    defecto real, a diferencia de `accessType`).
+  - `AssociationRelationship.directed` — `null` para cualquier otro tipo de
+    relación; siempre se resuelve a un booleano (por defecto `false`)
+    cuando la relación es una `AssociationRelationship`.
 - Vistas (views), con sus objetos de diagrama, objetos de diagrama
-  anidados, conexiones (incluidos los bendpoints) y notas
+  anidados, conexiones (incluidos los bendpoints), notas, y el código nativo
+  `viewpoint` (una cadena interna en minúsculas como `"layered"`, no un
+  nombre legible para humanos)
+- Nodos visuales `DiagramModelReference` (la función de Archi "insertar
+  vista como referencia"), incluyendo el id del modelo de diagrama
+  referenciado (`referencedModelId`) — distinguidos de un `Group` mediante
+  `xsiType`, no por la ausencia de `archimateElementId` (ambos son `null`
+  en ese caso)
 - Documentación y propiedades, incluyendo referencias de caracteres XML
   numéricas (p. ej. `&#xD;&#xA;`) decodificadas en lugar de dejarlas como
   texto literal
@@ -109,6 +132,14 @@ superficie pública.
 - Las vistas Sketch y Canvas de Archi: viven en la misma carpeta "Views"
   pero usan un tipo raíz distinto (no `archimate:`), por lo que se parsean
   como `ArchiElement`s simples en lugar de `ArchiView`s
+- Especialización de conceptos / perfiles ("Profile"/"Specialization" de
+  Archi 4.9+): investigado para esta versión, pero aplazado — no fue
+  posible confirmar, a partir de fuentes primarias y en el tiempo
+  disponible, la forma exacta que adopta en el XML nativo la referencia de
+  un concepto a sus perfiles, sin recurrir a suposiciones. Los modelos que
+  usan esta función se parsean correctamente; las asignaciones de perfil en
+  sí simplemente están ausentes del resultado, igual que cualquier otro
+  campo nativo aún no cubierto.
 
 ## Requisitos y formato de módulo
 

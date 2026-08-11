@@ -126,6 +126,58 @@ describe('validateArchiModel — broken diagram-object element reference', () =>
   });
 });
 
+describe('validateArchiModel — broken diagram-object model reference', () => {
+  it('flags a DiagramModelReference whose model id does not resolve', () => {
+    const xml = `${XML_HEADER}
+      <archimate:model ${NS} name="Broken Model Ref" id="model-broken-model-ref" version="5.0.0">
+        <folder name="Views" id="folder-views" type="diagrams">
+          <element xsi:type="archimate:ArchimateDiagramModel" name="View" id="view-1">
+            <child xsi:type="archimate:DiagramModelReference" id="vis-ref" model="does-not-exist">
+              <bounds x="0" y="0" width="10" height="10"/>
+            </child>
+          </element>
+        </folder>
+      </archimate:model>`;
+    const { valid, errors } = validateArchiModel(parseArchiModel(xml));
+    expect(valid).toBe(false);
+    const error = errors.find((e) => e.code === 'broken-diagram-object-model-reference');
+    expect(error).toMatchObject({ path: 'diagramObjects[vis-ref].referencedModelId' });
+  });
+
+  it('does not flag a DiagramModelReference whose model id resolves to an existing view', () => {
+    const xml = `${XML_HEADER}
+      <archimate:model ${NS} name="Valid Model Ref" id="model-valid-model-ref" version="5.0.0">
+        <folder name="Views" id="folder-views" type="diagrams">
+          <element xsi:type="archimate:ArchimateDiagramModel" name="View" id="view-1">
+            <child xsi:type="archimate:DiagramModelReference" id="vis-ref" model="view-2">
+              <bounds x="0" y="0" width="10" height="10"/>
+            </child>
+          </element>
+          <element xsi:type="archimate:ArchimateDiagramModel" name="Other View" id="view-2"/>
+        </folder>
+      </archimate:model>`;
+    const { valid, errors } = validateArchiModel(parseArchiModel(xml));
+    expect(valid).toBe(true);
+    expect(errors).toEqual([]);
+  });
+
+  it('does not flag a Group, which legitimately has no model reference', () => {
+    const xml = `${XML_HEADER}
+      <archimate:model ${NS} name="Group Only" id="model-group-only-2" version="5.0.0">
+        <folder name="Views" id="folder-views" type="diagrams">
+          <element xsi:type="archimate:ArchimateDiagramModel" name="View" id="view-1">
+            <child xsi:type="archimate:Group" id="group-1" name="Group">
+              <bounds x="0" y="0" width="10" height="10"/>
+            </child>
+          </element>
+        </folder>
+      </archimate:model>`;
+    const { valid, errors } = validateArchiModel(parseArchiModel(xml));
+    expect(valid).toBe(true);
+    expect(errors).toEqual([]);
+  });
+});
+
 describe('validateArchiModel — broken diagram-connection relationship reference', () => {
   it('flags a connection whose archimateRelationship id does not resolve', () => {
     const xml = `${XML_HEADER}

@@ -12,6 +12,13 @@ export interface ArchiView {
   folderPath: string;
   documentation: string | null;
   properties: ArchiProperty[];
+  /**
+   * Native Archi viewpoint code (e.g. `"layered"`, `"organization"`) from
+   * the `viewpoint` attribute — an internal lowercase code, not a
+   * human-readable name. `null` when unset (Archi's own default is an
+   * empty string, meaning "no viewpoint restriction").
+   */
+  viewpoint: string | null;
   /** Ids of diagram objects that are direct children of the view (not nested). */
   diagramObjectIds: string[];
   /** Ids of every diagram connection anywhere within this view, regardless of nesting depth. */

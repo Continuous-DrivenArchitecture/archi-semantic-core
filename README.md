@@ -64,7 +64,7 @@ keeps the library usable from Node.js, browsers, and tests alike.
   source no longer exists). This is not an enterprise-architecture quality
   linter — a model can validate cleanly and still be a poor architecture.
 - Types: `ArchiModel`, `ArchiModelMetadata`, `ArchiFolder`, `ArchiElement`,
-  `ArchiRelationship`, `ArchiView`, `ArchiDiagramObject`,
+  `ArchiRelationship`, `ArchiAccessType`, `ArchiView`, `ArchiDiagramObject`,
   `ArchiDiagramConnection`, `ArchiNote`, `ArchiBounds`, `ArchiBendpoint`,
   `ArchiProperty`, `ArchiValidationResult`, `ArchiValidationIssue`.
 
@@ -81,11 +81,30 @@ its public surface small.
 
 ## What's covered
 
-- Model metadata (id, name, version)
-- Folders, including empty ones, with parent/child hierarchy and path
+- Model metadata (id, name, version, `purpose`, and model-level properties)
+- Folders, including empty ones, with parent/child hierarchy, path,
+  documentation, and properties
 - ArchiMate elements and relationships of any type, generically
+- Relationship-specific native attributes:
+  - `AccessRelationship.accessType` — `'Write' | 'Read' | 'Unspecified' | 'ReadWrite'`,
+    decoded from Archi's native `0`-`3` encoding. `null` for every other
+    relationship type; always resolved to a value (defaulting to `'Write'`,
+    Archi's own documented default) when the relationship is an
+    `AccessRelationship` — the attribute being textually absent is not the
+    same as it being unset.
+  - `InfluenceRelationship.strength` — the free-text modifier (e.g. `"+"`).
+    `null` for every other relationship type, and also `null` when blank or
+    absent (there is no real default here, unlike `accessType`).
+  - `AssociationRelationship.directed` — `null` for every other relationship
+    type; always resolved to a boolean (defaulting to `false`) when the
+    relationship is an `AssociationRelationship`.
 - Views, with their diagram objects, nested diagram objects, connections
-  (including bendpoints), and notes
+  (including bendpoints), notes, and native `viewpoint` code (an internal
+  lowercase string like `"layered"`, not a human-readable name)
+- `DiagramModelReference` visual nodes (Archi's "insert view as reference"),
+  including the id of the referenced diagram model (`referencedModelId`) —
+  distinguished from a `Group` via `xsiType`, not by the absence of
+  `archimateElementId` (both are `null` there)
 - Documentation and properties, including numeric XML character references
   (e.g. `&#xD;&#xA;`) decoded rather than left as literal text
 - Non-`DiagramObject` visual containers (e.g. Archi's `Group`) — preserved
@@ -102,6 +121,13 @@ its public surface small.
 - Archi Sketch and Canvas views: these live in the same "Views" folder but
   use a different, non-`archimate:` root type, so they parse as plain
   `ArchiElement`s rather than `ArchiView`s
+- Concept specialization / profiles (Archi 4.9+'s "Profile"/"Specialization"
+  feature): investigated for this release, but deferred — the exact native
+  XML shape of a concept's profile references couldn't be confirmed from
+  primary sources in time to implement it without guessing. Models using
+  this feature will parse successfully; the profile assignments themselves
+  are silently absent from the result, same as any other not-yet-covered
+  native field.
 
 ## Requirements & module format
 

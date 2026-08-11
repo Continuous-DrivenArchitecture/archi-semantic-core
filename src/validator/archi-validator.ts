@@ -86,6 +86,13 @@ export function validateArchiModel(model: ArchiModel): ArchiValidationResult {
         path: `diagramObjects[${diagramObject.id}].archimateElementId`,
       });
     }
+    if (diagramObject.referencedModelId !== null && !ids.has(diagramObject.referencedModelId)) {
+      errors.push({
+        code: 'broken-diagram-object-model-reference',
+        message: `Diagram object ${diagramObject.id} references a missing model: ${diagramObject.referencedModelId}`,
+        path: `diagramObjects[${diagramObject.id}].referencedModelId`,
+      });
+    }
   }
 
   for (const connection of model.diagramConnections) {

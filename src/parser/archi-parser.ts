@@ -2,7 +2,7 @@ import { XMLParser, XMLValidator } from 'fast-xml-parser';
 import type { ArchiModel, ArchiModelMetadata } from '../domain/model.js';
 import type { ArchiFolder } from '../domain/folder.js';
 import type { ArchiElement } from '../domain/element.js';
-import type { ArchiRelationship } from '../domain/relationship.js';
+import type { ArchiRelationship, ArchiAccessType } from '../domain/relationship.js';
 import type { ArchiView } from '../domain/view.js';
 import type { ArchiDiagramObject, ArchiDiagramConnection, ArchiNote, ArchiBounds, ArchiBendpoint } from '../domain/diagram.js';
 import type { ArchiProperty } from '../domain/property.js';
@@ -21,6 +21,36 @@ const VIEW_TYPE_PATTERN = /ArchimateDiagramModel$/i;
 const RELATIONSHIP_TYPE_PATTERN = /Relationship$/i;
 const NOTE_TYPE_PATTERN = /Note$/i;
 const CONNECTION_TYPE_PATTERN = /Connection$/i;
+const DIAGRAM_MODEL_REFERENCE_TYPE_PATTERN = /DiagramModelReference$/i;
+
+/**
+ * Decodes `AccessRelationship`'s native `accessType` attribute (`"0"`-`"3"`,
+ * matching Archi's own `IAccessRelationship` constants). Absent ⇒ resolves
+ * to `'Write'`, Archi's own documented default for `WRITE_ACCESS = 0` — not
+ * `null` — since this is a field with a real native default, unlike
+ * `documentation`/`name`/`strength`.
+ */
+function decodeAccessType(raw: unknown): ArchiAccessType {
+  switch (text(raw)) {
+    case '1':
+      return 'Read';
+    case '2':
+      return 'Unspecified';
+    case '3':
+      return 'ReadWrite';
+    default:
+      return 'Write';
+  }
+}
+
+/**
+ * Decodes `AssociationRelationship`'s native `directed` attribute. Absent ⇒
+ * resolves to `false`, EMF's own type default for this `EBoolean` attribute
+ * — not `null` — for the same reason as {@link decodeAccessType}.
+ */
+function decodeDirected(raw: unknown): boolean {
+  return text(raw) === 'true';
+}
 
 function extractBounds(node: XmlNode): ArchiBounds | null {
   const bounds = node.bounds;
@@ -48,6 +78,15 @@ function extractDocumentation(node: XmlNode): string | null {
     .map((doc) => text(typeof doc === 'object' && doc !== null ? (doc as XmlNode)['#text'] : doc))
     .filter((value) => value.length > 0);
   return values.length > 0 ? values.join('\n') : null;
+}
+
+/**
+ * Reads the model root's native `<purpose>` element — Archi's own
+ * model-level narrative field, distinct from the generic `documentation`
+ * element that elements/relationships/views/folders carry.
+ */
+function extractPurpose(node: XmlNode): string | null {
+  return readOptionalText(typeof node.purpose === 'object' && node.purpose !== null ? (node.purpose as XmlNode)['#text'] : node.purpose);
 }
 
 function extractProperties(node: XmlNode): ArchiProperty[] {
@@ -155,9 +194,12 @@ export function parseArchiModel(xmlText: string): ArchiModel {
       }
 
       // Generic: any non-Note diagram child is a visual object (an Archi
-      // "DiagramObject", a "Group" container, or any other/future visual
-      // type) — preserved with its own xsiType rather than requiring a
-      // recognized type, so nothing is silently dropped.
+      // "DiagramObject", a "Group" container, a "DiagramModelReference", or
+      // any other/future visual type) — preserved with its own xsiType
+      // rather than requiring a recognized type, so nothing is silently
+      // dropped. xsiType (not archimateElementId) is the correct
+      // discriminator between a Group and a DiagramModelReference — both
+      // have a null archimateElementId.
       const id = text(attr(child, 'id'));
       diagramObjects.push({
         id,
@@ -166,6 +208,7 @@ export function parseArchiModel(xmlText: string): ArchiModel {
         viewId,
         parentId: ownerId,
         archimateElementId: readOptionalText(attr(child, 'archimateElement')),
+        referencedModelId: DIAGRAM_MODEL_REFERENCE_TYPE_PATTERN.test(xsiType) ? readOptionalText(attr(child, 'model')) : null,
         bounds: extractBounds(child),
         textPosition: readOptionalText(attr(child, 'textPosition')),
         textAlignment: readOptionalText(attr(child, 'textAlignment')),
@@ -182,7 +225,16 @@ export function parseArchiModel(xmlText: string): ArchiModel {
     const name = readOptionalText(attr(folderNode, 'name'));
     const type = text(attr(folderNode, 'type'));
     const path = parentPath ? `${parentPath}/${name ?? id}` : (name ?? id);
-    const folder: ArchiFolder = { id, name, type, parentId, path, containedIds: [] };
+    const folder: ArchiFolder = {
+      id,
+      name,
+      type,
+      parentId,
+      path,
+      containedIds: [],
+      documentation: extractDocumentation(folderNode),
+      properties: extractProperties(folderNode),
+    };
     folders.push(folder);
 
     for (const childFolder of asArray(folderNode.folder) as XmlNode[]) {
@@ -207,6 +259,7 @@ export function parseArchiModel(xmlText: string): ArchiModel {
           folderPath: path,
           documentation,
           properties,
+          viewpoint: readOptionalText(attr(element, 'viewpoint')),
           diagramObjectIds: [],
           diagramConnectionIds: [],
           noteIds: [],
@@ -225,6 +278,9 @@ export function parseArchiModel(xmlText: string): ArchiModel {
           folderPath: path,
           documentation,
           properties,
+          accessType: semanticType === 'AccessRelationship' ? decodeAccessType(attr(element, 'accessType')) : null,
+          strength: semanticType === 'InfluenceRelationship' ? readOptionalText(attr(element, 'strength')) : null,
+          directed: semanticType === 'AssociationRelationship' ? decodeDirected(attr(element, 'directed')) : null,
         });
       } else {
         elements.push({
@@ -295,6 +351,8 @@ export function parseArchiModel(xmlText: string): ArchiModel {
     id: text(attr(root, 'id')),
     name: text(attr(root, 'name')),
     version: text(attr(root, 'version')),
+    purpose: extractPurpose(root),
+    properties: extractProperties(root),
   };
 
   return { metadata, folders, elements, relationships, views, diagramObjects, diagramConnections, notes };

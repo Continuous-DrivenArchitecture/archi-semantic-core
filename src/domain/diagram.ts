@@ -31,6 +31,18 @@ export interface ArchiDiagramObject {
   parentId: string | null;
   /** Id of the referenced semantic element, or null for pure visual containers (e.g. Group). */
   archimateElementId: string | null;
+  /**
+   * Id of the referenced `IDiagramModel` (native `model` attribute),
+   * present only on a `DiagramModelReference` node — Archi's "insert view
+   * as reference" visual object. `null` for every other diagram-object
+   * type, including `Group` — `xsiType`, not `archimateElementId`, is the
+   * correct discriminator between the two: both have a null
+   * `archimateElementId`, but only a `DiagramModelReference` has a
+   * `referencedModelId`. The referenced id may point at any `IDiagramModel`
+   * (an ArchiMate diagram, or a Sketch/Canvas view), not only another
+   * `ArchiView`.
+   */
+  referencedModelId: string | null;
   bounds: ArchiBounds | null;
   /** Raw `textPosition` attribute (a coded value, not parsed to a number). */
   textPosition: string | null;

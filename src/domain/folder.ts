@@ -1,3 +1,5 @@
+import type { ArchiProperty } from './property.js';
+
 /**
  * A folder node from the Archi model tree (e.g. the standard "Business",
  * "Application", "Relations", "Views" buckets, plus any user-created
@@ -22,4 +24,6 @@ export interface ArchiFolder {
    * each subfolder's own `parentId`.
    */
   containedIds: string[];
+  documentation: string | null;
+  properties: ArchiProperty[];
 }
