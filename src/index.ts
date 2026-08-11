@@ -4,7 +4,7 @@ export type { ArchiValidationResult, ArchiValidationIssue } from './validator/ar
 
 export type { ArchiModel, ArchiModelMetadata } from './domain/model.js';
 export type { ArchiFolder } from './domain/folder.js';
-export type { ArchiElement } from './domain/element.js';
+export type { ArchiElement, ArchiJunctionType } from './domain/element.js';
 export type { ArchiRelationship, ArchiAccessType } from './domain/relationship.js';
 export type { ArchiView } from './domain/view.js';
 export type { ArchiDiagramObject, ArchiDiagramConnection, ArchiBendpoint, ArchiBounds, ArchiNote } from './domain/diagram.js';

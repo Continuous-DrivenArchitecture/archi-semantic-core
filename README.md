@@ -5,25 +5,40 @@
 A TypeScript parser for native `.archimate` model files created by the
 [Archi](https://www.archimatetool.com/) desktop editor.
 
-`archi-model-parser` reads Archi's own native XML format and turns it into a
-clean, well-typed `ArchiModel` — folders, elements, relationships, views,
-diagram objects, diagram connections, and notes — without requiring callers
-to understand the underlying XML structure.
+`archi-model-parser` reads Archi's native XML format and converts it into a
+clean, well-typed `ArchiModel` containing folders, elements, relationships,
+views, diagram objects, diagram connections, notes, properties, and the native
+semantic details needed to work with the model without understanding Archi's
+XML structure.
 
-```
+```text
 .archimate XML  →  archi-model-parser  →  ArchiModel
 ```
+
+## What this package is for
+
+Use this package when you need to work programmatically with an Archi model
+while keeping parsing independent from rendering, editing, quality rules, or
+exchange-format conversion.
+
+The parser focuses on two responsibilities:
+
+- preserving Archi-native information that belongs to the semantic model;
+- exposing that information through a small, typed TypeScript API.
+
+It does not reinterpret the model for another standard.
 
 ## What this is not
 
 This package parses Archi's **native** `.archimate` file format
-(`xmlns:archimate="http://www.archimatetool.com/archimate"`) — the format
-Archi itself reads and writes on disk.
+(`xmlns:archimate="http://www.archimatetool.com/archimate"`) — the format Archi
+itself reads and writes on disk.
 
-It is **not** a parser or generator for the [ArchiMate® Model Exchange File
-Format](https://www.opengroup.org/xsd/archimate/) ("Open Exchange"), and it
-has no UI, editing, or rendering functionality. Those are different concerns
-and may become separate packages later.
+It is **not** a parser or generator for the
+[ArchiMate® Model Exchange File Format](https://www.opengroup.org/xsd/archimate/),
+and it has no UI, editor, renderer, or diagram-routing engine.
+
+Those are separate concerns and belong in separate packages.
 
 This project is not affiliated with or endorsed by Archi, the Archi Tool
 project, or The Open Group.
@@ -37,103 +52,212 @@ npm install @continuousarchitecture/archi-model-parser
 ## Usage
 
 ```ts
-import { parseArchiModel, validateArchiModel } from '@continuousarchitecture/archi-model-parser';
+import {
+  parseArchiModel,
+  validateArchiModel,
+} from '@continuousarchitecture/archi-model-parser';
 
-const model = parseArchiModel(xml); // xml: string — read it however you like (fs, fetch, File API, ...)
+const model = parseArchiModel(xml);
 
 console.log(model.elements);
 console.log(model.relationships);
 console.log(model.views);
 
-console.log(model.elements[0].type); // e.g. "ApplicationComponent" — a clean semantic type, not "archimate:ApplicationComponent"
+console.log(model.elements[0].type);
+// e.g. "ApplicationComponent", not "archimate:ApplicationComponent"
 
 const { valid, errors } = validateArchiModel(model);
 ```
 
-`parseArchiModel` only accepts XML text — reading a file from disk, the
-browser File API, or over the network is the caller's responsibility. This
-keeps the library usable from Node.js, browsers, and tests alike.
+`parseArchiModel` accepts XML text only. Reading a file from disk, using the
+browser File API, or fetching XML over the network is the caller's
+responsibility. This keeps the package usable from Node.js, browser bundlers,
+and tests without coupling it to a specific I/O environment.
 
 ## API
 
-- `parseArchiModel(xml: string): ArchiModel` — parses Archi XML text into a
-  semantic model. Throws if `xml` isn't a string or isn't well-formed XML.
-- `validateArchiModel(model: ArchiModel): ArchiValidationResult` — checks the
-  *structural* integrity of an already-parsed model: missing ids, duplicate
-  ids, and dangling references between entities (e.g. a relationship whose
-  source no longer exists). This is not an enterprise-architecture quality
-  linter — a model can validate cleanly and still be a poor architecture.
-- Types: `ArchiModel`, `ArchiModelMetadata`, `ArchiFolder`, `ArchiElement`,
-  `ArchiRelationship`, `ArchiAccessType`, `ArchiView`, `ArchiDiagramObject`,
-  `ArchiDiagramConnection`, `ArchiNote`, `ArchiBounds`, `ArchiBendpoint`,
-  `ArchiProperty`, `ArchiValidationResult`, `ArchiValidationIssue`.
+### `parseArchiModel(xml: string): ArchiModel`
 
-Every element and relationship exposes both the raw `xsiType` (e.g.
-`"archimate:BusinessActor"`) and a derived, namespace-prefix-stripped
-`type` (e.g. `"BusinessActor"`) — generically, for any Archi type, not just
-a fixed list of known ArchiMate concepts.
+Parses native Archi XML text into a semantic model.
 
-Cross-references between entities (a relationship's `sourceId`, a diagram
-object's `archimateElementId`, ...) are plain string ids. Look them up in
-the relevant array, or build a `Map` keyed by `id` if you need repeated
-lookups — the library intentionally doesn't ship a lookup helper, to keep
-its public surface small.
+It throws when the input is not a string or the XML is not well formed.
+
+### `validateArchiModel(model: ArchiModel): ArchiValidationResult`
+
+Checks the structural integrity of an already parsed model, including:
+
+- missing identifiers;
+- duplicate identifiers;
+- dangling references between entities;
+- unresolved native Junction type values.
+
+This validator is not an enterprise-architecture quality linter. A model can
+be structurally valid and still represent poor architecture.
+
+### Public types
+
+The package exports:
+
+- `ArchiModel`
+- `ArchiModelMetadata`
+- `ArchiFolder`
+- `ArchiElement`
+- `ArchiJunctionType`
+- `ArchiRelationship`
+- `ArchiAccessType`
+- `ArchiView`
+- `ArchiDiagramObject`
+- `ArchiDiagramConnection`
+- `ArchiNote`
+- `ArchiBounds`
+- `ArchiBendpoint`
+- `ArchiProperty`
+- `ArchiValidationResult`
+- `ArchiValidationIssue`
+
+## Raw and semantic types
+
+Elements and relationships expose both:
+
+- `xsiType`: the native XML value, for example
+  `"archimate:BusinessActor"`;
+- `type`: the namespace-prefix-stripped semantic value, for example
+  `"BusinessActor"`.
+
+This derivation is generic. The parser does not require every possible Archi
+type to be hard-coded in advance.
+
+Cross-references such as `sourceId`, `targetId`, `archimateElementId`,
+`referencedModelId`, and diagram connection endpoints are plain string
+identifiers.
+
+The package intentionally does not ship lookup helpers. Callers that need
+repeated lookups can build `Map<string, ...>` indexes appropriate to their own
+workload.
+
+## Junction semantics
+
+Archi stores AND/OR Junction identity using a native `type` attribute that is
+separate from the element's `xsi:type`.
+
+For a Junction, the parser exposes both the interpreted semantic value and the
+original native value:
+
+```ts
+type ArchiJunctionType = 'And' | 'Or';
+
+interface ArchiElement {
+  junctionType: ArchiJunctionType | null;
+  rawJunctionType: string | null;
+}
+```
+
+The decoding rules are:
+
+| Native Junction `type` | `junctionType` | `rawJunctionType` |
+| --- | --- | --- |
+| absent | `'And'` | `''` |
+| `""` | `'And'` | `''` |
+| `"or"` | `'Or'` | `'or'` |
+| any other value | `null` | original value |
+
+Unknown native values are never guessed or discarded.
+
+`parseArchiModel` still succeeds, while `validateArchiModel` reports
+`unrecognized-junction-type` for a Junction whose native value cannot be
+resolved.
+
+For every non-Junction element:
+
+```ts
+junctionType === null
+rawJunctionType === null
+```
+
+## Relationship-specific native attributes
+
+### Access
+
+`AccessRelationship.accessType` is exposed as:
+
+```ts
+'Write' | 'Read' | 'Unspecified' | 'ReadWrite'
+```
+
+It is decoded from Archi's native `0`-`3` representation.
+
+For an `AccessRelationship`, the field is always resolved to a value. When the
+native attribute is absent, the parser uses Archi's native default:
+`'Write'`.
+
+For every other relationship type, `accessType` is `null`.
+
+### Influence
+
+`InfluenceRelationship.strength` contains the native free-text modifier, for
+example `"+"`.
+
+It is `null` for every other relationship type and also when the native value
+is blank or absent.
+
+### Association
+
+`AssociationRelationship.directed` is resolved to a boolean for association
+relationships, using `false` as the native default when the attribute is
+absent.
+
+For every other relationship type, `directed` is `null`.
 
 ## What's covered
 
-- Model metadata (id, name, version, `purpose`, and model-level properties)
-- Folders, including empty ones, with parent/child hierarchy, path,
-  documentation, and properties
-- ArchiMate elements and relationships of any type, generically
-- Relationship-specific native attributes:
-  - `AccessRelationship.accessType` — `'Write' | 'Read' | 'Unspecified' | 'ReadWrite'`,
-    decoded from Archi's native `0`-`3` encoding. `null` for every other
-    relationship type; always resolved to a value (defaulting to `'Write'`,
-    Archi's own documented default) when the relationship is an
-    `AccessRelationship` — the attribute being textually absent is not the
-    same as it being unset.
-  - `InfluenceRelationship.strength` — the free-text modifier (e.g. `"+"`).
-    `null` for every other relationship type, and also `null` when blank or
-    absent (there is no real default here, unlike `accessType`).
-  - `AssociationRelationship.directed` — `null` for every other relationship
-    type; always resolved to a boolean (defaulting to `false`) when the
-    relationship is an `AssociationRelationship`.
-- Views, with their diagram objects, nested diagram objects, connections
-  (including bendpoints), notes, and native `viewpoint` code (an internal
-  lowercase string like `"layered"`, not a human-readable name)
-- `DiagramModelReference` visual nodes (Archi's "insert view as reference"),
-  including the id of the referenced diagram model (`referencedModelId`) —
-  distinguished from a `Group` via `xsiType`, not by the absence of
-  `archimateElementId` (both are `null` there)
-- Documentation and properties, including numeric XML character references
-  (e.g. `&#xD;&#xA;`) decoded rather than left as literal text
-- Non-`DiagramObject` visual containers (e.g. Archi's `Group`) — preserved
-  generically rather than dropped
+- Model metadata: id, name, native version, `purpose`, and model-level properties.
+- Folders, including empty folders, hierarchy, path, documentation, and properties.
+- ArchiMate elements and relationships preserved generically.
+- Junction AND/OR native semantics.
+- Relationship-specific Access, Influence, and Association attributes.
+- Views with native `viewpoint`, nested diagram objects, notes, connections, and bendpoints.
+- `DiagramModelReference` nodes, including `referencedModelId`.
+- Generic visual containers such as Archi `Group`.
+- Documentation and properties.
+- Numeric XML character references such as `&#xD;&#xA;`, decoded into text.
+
+Collections preserve source XML order.
 
 ## What's out of scope
 
-- ArchiMate Open Exchange File Format (import or export)
-- Editing, mutation, or re-serializing a model back to XML
-- Rendering, diagramming, or any UI
-- Presentational-only attributes (fill/line/font colors, Archi's `<feature>`
-  mechanism, etc.) — visual-styling concerns outside "structure and
-  semantics"
-- Archi Sketch and Canvas views: these live in the same "Views" folder but
-  use a different, non-`archimate:` root type, so they parse as plain
-  `ArchiElement`s rather than `ArchiView`s
-- Concept specialization / profiles (Archi 4.9+'s "Profile"/"Specialization"
-  feature): investigated for this release, but deferred — the exact native
-  XML shape of a concept's profile references couldn't be confirmed from
-  primary sources in time to implement it without guessing. Models using
-  this feature will parse successfully; the profile assignments themselves
-  are silently absent from the result, same as any other not-yet-covered
-  native field.
+- ArchiMate Model Exchange File Format import or export.
+- Editing or mutating a model.
+- Serializing an `ArchiModel` back to native `.archimate` XML.
+- Rendering, diagramming, automatic routing, or UI.
+- Presentational-only attributes such as fill colors, line colors, fonts, and
+  Archi's `<feature>` styling mechanism.
+- Archi Sketch and Canvas views as semantic `ArchiView`s. These use
+  non-`archimate:` root types and are preserved generically rather than
+  reinterpreted as ArchiMate views.
+- Concept specialization / profiles. Their native serialization remains
+  deliberately unsupported until it can be represented from confirmed native
+  source behavior without guessing.
 
-## Requirements & module format
+## Requirements and module format
 
-Node.js `^20.0.0 || ^22.0.0 || >=24.0.0`, or a modern browser bundler. The
-package is published as ESM only (`"type": "module"`, no CommonJS build) —
-`require('@continuousarchitecture/archi-model-parser')` is not supported.
+Node.js:
+
+```text
+^20.0.0 || ^22.0.0 || >=24.0.0
+```
+
+The package is ESM-only:
+
+```json
+{
+  "type": "module"
+}
+```
+
+CommonJS `require('@continuousarchitecture/archi-model-parser')` is not
+supported.
+
+A modern browser bundler can also consume the package.
 
 ## Development
 
@@ -142,10 +266,21 @@ git clone https://github.com/ContinuousArchitecture/archi-model-parser.git
 cd archi-model-parser
 npm install
 
-npm run typecheck  # tsc --noEmit
-npm run build       # emit dist/ (.js + .d.ts + source maps + declaration maps)
-npm test            # vitest run
+npm run typecheck
+npm run build
+npm test
+npm pack --dry-run
 ```
+
+## Design principle
+
+`archi-model-parser` should understand **Archi's native model semantics**.
+
+It should not know how another format, renderer, editor, or exchange standard
+chooses to represent those semantics.
+
+That boundary keeps the parser reusable as a foundation for other
+ContinuousArchitecture tooling.
 
 ## License
 

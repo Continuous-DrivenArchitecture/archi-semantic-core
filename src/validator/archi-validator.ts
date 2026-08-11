@@ -78,6 +78,16 @@ export function validateArchiModel(model: ArchiModel): ArchiValidationResult {
     }
   }
 
+  for (const element of model.elements) {
+    if (element.type === 'Junction' && element.junctionType === null) {
+      errors.push({
+        code: 'unrecognized-junction-type',
+        message: `Junction ${element.id} has an unrecognized native type attribute: "${element.rawJunctionType}"`,
+        path: `elements[${element.id}].junctionType`,
+      });
+    }
+  }
+
   for (const diagramObject of model.diagramObjects) {
     if (diagramObject.archimateElementId !== null && !ids.has(diagramObject.archimateElementId)) {
       errors.push({

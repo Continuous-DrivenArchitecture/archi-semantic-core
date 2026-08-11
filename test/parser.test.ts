@@ -2,6 +2,9 @@ import { describe, expect, it } from 'vitest';
 import { parseArchiModel } from '../src/index.js';
 import { loadFixture } from './helpers/load-fixture.js';
 
+const XML_HEADER = '<?xml version="1.0" encoding="UTF-8"?>';
+const NS = 'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:archimate="http://www.archimatetool.com/archimate"';
+
 describe('parseArchiModel — minimal model', () => {
   const model = parseArchiModel(loadFixture('minimal.archimate'));
 
@@ -35,6 +38,8 @@ describe('parseArchiModel — minimal model', () => {
         folderPath: 'Business',
         documentation: null,
         properties: [],
+        junctionType: null,
+        rawJunctionType: null,
       },
     ]);
   });
@@ -259,6 +264,38 @@ describe('parseArchiModel — documentation, properties, and Group containers', 
     expect(visualSharedA.archimateElementId).toBe('element-shared');
     expect(visualSharedA.textAlignment).toBe('1');
     expect(visualSharedA.textPosition).toBe('1');
+  });
+});
+
+describe('parseArchiModel — Junction native AND/OR discriminator', () => {
+  const model = parseArchiModel(loadFixture('junction-types.archimate'));
+  const byId = new Map(model.elements.map((el) => [el.id, el]));
+
+  it('resolves an absent native type attribute to And (Archi\'s own documented default)', () => {
+    expect(byId.get('junction-absent')).toMatchObject({ junctionType: 'And', rawJunctionType: '' });
+  });
+
+  it('resolves an explicit empty type="" attribute to And', () => {
+    expect(byId.get('junction-empty')).toMatchObject({ junctionType: 'And', rawJunctionType: '' });
+  });
+
+  it('resolves type="or" to Or', () => {
+    expect(byId.get('junction-or')).toMatchObject({ junctionType: 'Or', rawJunctionType: 'or' });
+  });
+
+  it('leaves junctionType and rawJunctionType null for every non-Junction element', () => {
+    expect(byId.get('element-plain')).toMatchObject({ junctionType: null, rawJunctionType: null });
+  });
+
+  it('never guesses an unrecognized native type value: preserves it verbatim in rawJunctionType instead of coercing junctionType to And/Or', () => {
+    const xml = `${XML_HEADER}
+      <archimate:model ${NS} name="Unknown Junction Type" id="model-unknown-junction-type" version="5.0.0">
+        <folder name="Other" id="folder-other" type="other">
+          <element xsi:type="archimate:Junction" id="junction-xor" type="xor"/>
+        </folder>
+      </archimate:model>`;
+    const unknown = parseArchiModel(xml);
+    expect(unknown.elements[0]).toMatchObject({ junctionType: null, rawJunctionType: 'xor' });
   });
 });
 

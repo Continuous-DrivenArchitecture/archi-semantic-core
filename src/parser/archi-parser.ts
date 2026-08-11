@@ -1,7 +1,7 @@
 import { XMLParser, XMLValidator } from 'fast-xml-parser';
 import type { ArchiModel, ArchiModelMetadata } from '../domain/model.js';
 import type { ArchiFolder } from '../domain/folder.js';
-import type { ArchiElement } from '../domain/element.js';
+import type { ArchiElement, ArchiJunctionType } from '../domain/element.js';
 import type { ArchiRelationship, ArchiAccessType } from '../domain/relationship.js';
 import type { ArchiView } from '../domain/view.js';
 import type { ArchiDiagramObject, ArchiDiagramConnection, ArchiNote, ArchiBounds, ArchiBendpoint } from '../domain/diagram.js';
@@ -50,6 +50,19 @@ function decodeAccessType(raw: unknown): ArchiAccessType {
  */
 function decodeDirected(raw: unknown): boolean {
   return text(raw) === 'true';
+}
+
+/**
+ * Decodes a Junction's native `type` attribute (Archi's own `IJunction`
+ * constants: `AND_JUNCTION_TYPE = ""`, `OR_JUNCTION_TYPE = "or"`). Unlike
+ * {@link decodeAccessType}/{@link decodeDirected}, a value that is neither
+ * of these two is *not* coerced to a default — it's genuinely unknown data,
+ * not an absent attribute, so this returns `null` rather than guessing.
+ */
+function decodeJunctionType(raw: string): ArchiJunctionType | null {
+  if (raw === '') return 'And';
+  if (raw === 'or') return 'Or';
+  return null;
 }
 
 function extractBounds(node: XmlNode): ArchiBounds | null {
@@ -283,6 +296,8 @@ export function parseArchiModel(xmlText: string): ArchiModel {
           directed: semanticType === 'AssociationRelationship' ? decodeDirected(attr(element, 'directed')) : null,
         });
       } else {
+        const isJunction = semanticType === 'Junction';
+        const rawJunctionType = isJunction ? readOptionalText(attr(element, 'type')) ?? '' : null;
         elements.push({
           id: elementId,
           name: name2,
@@ -292,6 +307,8 @@ export function parseArchiModel(xmlText: string): ArchiModel {
           folderPath: path,
           documentation,
           properties,
+          junctionType: rawJunctionType !== null ? decodeJunctionType(rawJunctionType) : null,
+          rawJunctionType,
         });
       }
       folder.containedIds.push(elementId);

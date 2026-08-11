@@ -91,6 +91,40 @@ describe('validateArchiModel — broken relationship references', () => {
   });
 });
 
+describe('validateArchiModel — unrecognized Junction native type', () => {
+  it('flags a Junction whose native type attribute is neither recognized value', () => {
+    const xml = `${XML_HEADER}
+      <archimate:model ${NS} name="Unknown Junction Type" id="model-unknown-junction-type" version="5.0.0">
+        <folder name="Other" id="folder-other" type="other">
+          <element xsi:type="archimate:Junction" id="junction-xor" type="xor"/>
+        </folder>
+      </archimate:model>`;
+    const { valid, errors } = validateArchiModel(parseArchiModel(xml));
+    expect(valid).toBe(false);
+    const error = errors.find((e) => e.code === 'unrecognized-junction-type');
+    expect(error).toMatchObject({ path: 'elements[junction-xor].junctionType' });
+  });
+
+  it('does not flag any Junction whose native type resolves to And or Or', () => {
+    const model = parseArchiModel(loadFixture('junction-types.archimate'));
+    const { valid, errors } = validateArchiModel(model);
+    expect(valid).toBe(true);
+    expect(errors).toEqual([]);
+  });
+
+  it('does not flag a non-Junction element', () => {
+    const xml = `${XML_HEADER}
+      <archimate:model ${NS} name="Plain Element" id="model-plain-element" version="5.0.0">
+        <folder name="Business" id="folder-business" type="business">
+          <element xsi:type="archimate:BusinessActor" name="Actor" id="actor-1"/>
+        </folder>
+      </archimate:model>`;
+    const { valid, errors } = validateArchiModel(parseArchiModel(xml));
+    expect(valid).toBe(true);
+    expect(errors).toEqual([]);
+  });
+});
+
 describe('validateArchiModel — broken diagram-object element reference', () => {
   it('flags a diagram object whose archimateElement id does not resolve', () => {
     const xml = `${XML_HEADER}

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<archimate:model xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:archimate="http://www.archimatetool.com/archimate" name="Junction Types" id="model-junction-types" version="5.0.0">
+  <folder name="Other" id="folder-other" type="other">
+    <element xsi:type="archimate:Junction" id="junction-absent"/>
+    <element xsi:type="archimate:Junction" id="junction-empty" type=""/>
+    <element xsi:type="archimate:Junction" id="junction-or" type="or"/>
+    <element xsi:type="archimate:BusinessActor" name="Not A Junction" id="element-plain"/>
+  </folder>
+</archimate:model>
