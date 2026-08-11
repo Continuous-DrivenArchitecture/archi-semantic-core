@@ -1,0 +1,53 @@
+{
+  "name": "archi-model-parser",
+  "version": "0.1.0",
+  "description": "Parse Archi desktop editor's native .archimate XML files into a clean, well-typed TypeScript domain model.",
+  "keywords": [
+    "archimate",
+    "archi",
+    "enterprise-architecture",
+    "xml",
+    "parser",
+    "typescript"
+  ],
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": "^20.0.0 || ^22.0.0 || >=24.0.0"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "build": "tsc -p tsconfig.build.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "prepublishOnly": "npm run typecheck && npm run build && npm test"
+  },
+  "dependencies": {
+    "fast-xml-parser": "^5.10.1"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "5.9.3",
+    "vitest": "^4.1.10"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ContinuousArchitecture/archi-model-parser.git"
+  },
+  "homepage": "https://github.com/ContinuousArchitecture/archi-model-parser#readme",
+  "bugs": {
+    "url": "https://github.com/ContinuousArchitecture/archi-model-parser/issues"
+  }
+}

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<archimate:model xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:archimate="http://www.archimatetool.com/archimate" name="Empty Fixture" id="model-empty-fixture" version="5.0.0">
+  <folder name="Empty root" id="folder-root-empty" type="business"/>
+  <folder name="Parent" id="folder-parent" type="application">
+    <folder name="Empty child" id="folder-child-empty" type="application"/>
+  </folder>
+</archimate:model>

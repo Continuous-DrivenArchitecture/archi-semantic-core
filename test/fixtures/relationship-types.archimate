@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<archimate:model xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:archimate="http://www.archimatetool.com/archimate" name="Relationship Types" id="model-relationship-types" version="5.0.0">
+  <folder name="Business" id="folder-business" type="business">
+    <element xsi:type="archimate:BusinessActor" name="Customer" id="element-actor"/>
+    <element xsi:type="archimate:BusinessRole" name="Account Manager" id="element-role"/>
+    <element xsi:type="archimate:BusinessProcess" name="Open Account" id="element-process"/>
+    <element xsi:type="archimate:BusinessService" name="Account Opening Service" id="element-service"/>
+    <element xsi:type="archimate:BusinessObject" name="Account Application" id="element-object"/>
+  </folder>
+  <folder name="Application" id="folder-application" type="application">
+    <element xsi:type="archimate:ApplicationComponent" name="Core Banking System" id="element-app"/>
+    <element xsi:type="archimate:DataObject" name="Application Record" id="element-data"/>
+  </folder>
+  <folder name="Relations" id="folder-relations" type="relations">
+    <element xsi:type="archimate:ServingRelationship" name="serves" id="relationship-serving" source="element-service" target="element-actor"/>
+    <element xsi:type="archimate:AssignmentRelationship" id="relationship-assignment" source="element-role" target="element-process"/>
+    <element xsi:type="archimate:RealizationRelationship" id="relationship-realization" source="element-process" target="element-service"/>
+    <element xsi:type="archimate:AccessRelationship" id="relationship-access" source="element-process" target="element-object"/>
+    <element xsi:type="archimate:CompositionRelationship" id="relationship-composition" source="element-app" target="element-data"/>
+    <element xsi:type="archimate:AggregationRelationship" id="relationship-aggregation" source="element-process" target="element-object"/>
+    <element xsi:type="archimate:AssociationRelationship" name="uses" id="relationship-association" source="element-actor" target="element-app"/>
+  </folder>
+</archimate:model>
