@@ -32,13 +32,13 @@ Tool, ni The Open Group.
 ## Instalación
 
 ```sh
-npm install archi-model-parser
+npm install @continuousarchitecture/archi-model-parser
 ```
 
 ## Uso
 
 ```ts
-import { parseArchiModel, validateArchiModel } from 'archi-model-parser';
+import { parseArchiModel, validateArchiModel } from '@continuousarchitecture/archi-model-parser';
 
 const model = parseArchiModel(xml); // xml: string — léelo como prefieras (fs, fetch, File API, ...)
 

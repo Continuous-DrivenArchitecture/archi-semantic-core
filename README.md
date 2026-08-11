@@ -31,13 +31,13 @@ project, or The Open Group.
 ## Install
 
 ```sh
-npm install archi-model-parser
+npm install @continuousarchitecture/archi-model-parser
 ```
 
 ## Usage
 
 ```ts
-import { parseArchiModel, validateArchiModel } from 'archi-model-parser';
+import { parseArchiModel, validateArchiModel } from '@continuousarchitecture/archi-model-parser';
 
 const model = parseArchiModel(xml); // xml: string — read it however you like (fs, fetch, File API, ...)
 
