@@ -56,6 +56,16 @@ function extractProperties(node: XmlNode): ArchiProperty[] {
     .filter((prop) => prop.key.length > 0);
 }
 
+/** Appends `id` to the bucket for `key`, creating the bucket on first use. */
+function pushToIndex(index: Map<string, string[]>, key: string, id: string): void {
+  const bucket = index.get(key);
+  if (bucket) {
+    bucket.push(id);
+  } else {
+    index.set(key, [id]);
+  }
+}
+
 /**
  * Parses native Archi `.archimate` XML text into a clean, semantic
  * {@link ArchiModel}. Accepts XML text only — reading a file from disk, the
@@ -236,19 +246,49 @@ export function parseArchiModel(xmlText: string): ArchiModel {
     walkFolder(folderNode, '', null);
   }
 
-  // Single derivation pass: every diagram object/connection/note has already
-  // been fully recorded above (parentId/viewId/sourceId all set), so the
-  // convenience id-list fields can now simply be filtered out — no
-  // execution-order hazard, unlike a second pass that depends on a first
-  // pass still in progress.
+  // Derivation phase: every diagram object/connection/note has already been
+  // fully recorded above (parentId/viewId/sourceId all set), so the
+  // convenience id-list fields can now be derived — no execution-order
+  // hazard, unlike a second pass that depends on a first pass still in
+  // progress. Rather than re-filtering the complete collections once per
+  // object/view (O(n^2) on large models), build each grouping as a
+  // Map<ownerId, id[]> in a single pass over its source collection, then
+  // look up each object's/view's bucket directly. Every collection is
+  // still visited in its original push (i.e. document) order, so the
+  // resulting id lists preserve the same ordering the previous
+  // filter-based implementation produced.
+  const childrenByParentId = new Map<string, string[]>();
+  const rootObjectIdsByViewId = new Map<string, string[]>();
   for (const diagramObject of diagramObjects) {
-    diagramObject.childrenIds = diagramObjects.filter((candidate) => candidate.parentId === diagramObject.id).map((candidate) => candidate.id);
-    diagramObject.connectionIds = diagramConnections.filter((connection) => connection.sourceId === diagramObject.id).map((connection) => connection.id);
+    if (diagramObject.parentId !== null) {
+      pushToIndex(childrenByParentId, diagramObject.parentId, diagramObject.id);
+    } else {
+      pushToIndex(rootObjectIdsByViewId, diagramObject.viewId, diagramObject.id);
+    }
+  }
+
+  const connectionIdsBySourceId = new Map<string, string[]>();
+  const connectionIdsByViewId = new Map<string, string[]>();
+  for (const connection of diagramConnections) {
+    pushToIndex(connectionIdsBySourceId, connection.sourceId, connection.id);
+    pushToIndex(connectionIdsByViewId, connection.viewId, connection.id);
+  }
+
+  const rootNoteIdsByViewId = new Map<string, string[]>();
+  for (const note of notes) {
+    if (note.parentId === null) {
+      pushToIndex(rootNoteIdsByViewId, note.viewId, note.id);
+    }
+  }
+
+  for (const diagramObject of diagramObjects) {
+    diagramObject.childrenIds = childrenByParentId.get(diagramObject.id) ?? [];
+    diagramObject.connectionIds = connectionIdsBySourceId.get(diagramObject.id) ?? [];
   }
   for (const view of views) {
-    view.diagramObjectIds = diagramObjects.filter((obj) => obj.viewId === view.id && obj.parentId === null).map((obj) => obj.id);
-    view.noteIds = notes.filter((note) => note.viewId === view.id && note.parentId === null).map((note) => note.id);
-    view.diagramConnectionIds = diagramConnections.filter((connection) => connection.viewId === view.id).map((connection) => connection.id);
+    view.diagramObjectIds = rootObjectIdsByViewId.get(view.id) ?? [];
+    view.noteIds = rootNoteIdsByViewId.get(view.id) ?? [];
+    view.diagramConnectionIds = connectionIdsByViewId.get(view.id) ?? [];
   }
 
   const metadata: ArchiModelMetadata = {
