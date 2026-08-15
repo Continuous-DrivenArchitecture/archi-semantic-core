@@ -32,13 +32,15 @@
     "build": "tsc -p tsconfig.build.json",
     "test": "vitest run",
     "test:watch": "vitest",
-    "prepublishOnly": "npm run typecheck && npm run build && npm test"
+    "badges": "node scripts/generate-badges.mjs",
+    "prepublishOnly": "npm run typecheck && npm run build && npm test && npm run badges"
   },
   "dependencies": {
     "fast-xml-parser": "^5.10.1"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
+    "badge-maker": "^6.0.0",
     "typescript": "5.9.3",
     "vitest": "^4.1.10"
   },

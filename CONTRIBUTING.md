@@ -117,8 +117,10 @@ files — follow the existing pattern rather than re-deriving it):
 - Rebuild the Table of Contents anchors to match GitHub's heading-slug
   algorithm for the translated headings — don't just copy the English
   anchors.
-- Keep the language-switcher line (flag icon + shields.io badge per
-  language) identical, byte-for-byte, across all seven files.
+- Keep the language-switcher line (local badge per language, pointing at
+  `docs/badges/lang-<code>.svg`) identical, byte-for-byte, across all seven
+  files. Run `npm run badges` after bumping the version in `package.json`
+  so `docs/badges/version.svg` stays in sync.
 
 CONTRIBUTING.md itself is English-only, matching the convention used across
 the other Continuous-DrivenArchitecture repos.
