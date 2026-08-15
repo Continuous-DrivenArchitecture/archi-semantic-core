@@ -1,15 +1,15 @@
-# archi-model-parser
+# archi-semantic-core
 
-[![npm version](https://img.shields.io/npm/v/@continuousarchitecture/archi-model-parser.svg)](https://www.npmjs.com/package/@continuousarchitecture/archi-model-parser) [![License: MIT](https://img.shields.io/npm/l/@continuousarchitecture/archi-model-parser.svg)](./LICENSE)
+[![npm version](https://img.shields.io/npm/v/@cda/archi-semantic-core.svg)](https://www.npmjs.com/package/@cda/archi-semantic-core) [![License: MIT](https://img.shields.io/npm/l/@cda/archi-semantic-core.svg)](./LICENSE)
 
 [<img src="https://flagcdn.com/20x15/gb.png" width="20" height="15" alt=""> ![English](https://img.shields.io/badge/English-4c9aff)](README.md) [<img src="https://flagcdn.com/20x15/de.png" width="20" height="15" alt=""> ![Deutsch](https://img.shields.io/badge/Deutsch-4c9aff)](README.de.md) [<img src="https://flagcdn.com/20x15/es.png" width="20" height="15" alt=""> ![Español](https://img.shields.io/badge/Español-4c9aff)](README.es.md) [<img src="https://flagcdn.com/20x15/fr.png" width="20" height="15" alt=""> ![Français](https://img.shields.io/badge/Français-4c9aff)](README.fr.md) [<img src="https://flagcdn.com/20x15/nl.png" width="20" height="15" alt=""> ![Nederlands](https://img.shields.io/badge/Nederlands-4c9aff)](README.nl.md) [<img src="https://flagcdn.com/20x15/pt.png" width="20" height="15" alt=""> ![Português](https://img.shields.io/badge/Português-4c9aff)](README.pt.md) [<img src="https://flagcdn.com/20x15/cn.png" width="20" height="15" alt=""> ![中文](https://img.shields.io/badge/中文-4c9aff)](README.zh.md)
 
 一个用于解析 [Archi](https://www.archimatetool.com/) 桌面编辑器所创建的原生 `.archimate` 模型文件的 TypeScript 解析器。
 
-`archi-model-parser` 会读取 Archi 的原生 XML 格式，并将其转换为结构清晰、类型完善的 `ArchiModel`，其中包含文件夹、元素、关系、视图、图表对象、图表连接、便签、属性、视觉样式、Specializations/Profiles，以及在无需了解 Archi XML 结构的情况下使用该模型所需的各项原生语义细节。它同样支持读取 `.archimate` 文件格式的压缩包（zip）变体。
+`archi-semantic-core` 会读取 Archi 的原生 XML 格式，并将其转换为结构清晰、类型完善的 `ArchiModel`，其中包含文件夹、元素、关系、视图、图表对象、图表连接、便签、属性、视觉样式、Specializations/Profiles，以及在无需了解 Archi XML 结构的情况下使用该模型所需的各项原生语义细节。它同样支持读取 `.archimate` 文件格式的压缩包（zip）变体。
 
 ```text
-.archimate XML  →  archi-model-parser  →  ArchiModel
+.archimate XML  →  archi-semantic-core  →  ArchiModel
 ```
 
 ## 目录
@@ -69,7 +69,7 @@
 ## 安装
 
 ```sh
-npm install @continuousarchitecture/archi-model-parser
+npm install @cda/archi-semantic-core
 ```
 
 ## 用法
@@ -78,7 +78,7 @@ npm install @continuousarchitecture/archi-model-parser
 import {
   parseArchiModel,
   validateArchiModel,
-} from '@continuousarchitecture/archi-model-parser';
+} from '@cda/archi-semantic-core';
 
 const model = parseArchiModel(xml);
 
@@ -98,7 +98,7 @@ Archi 也可以将 `.archimate` 文件保存为压缩包（zip）——只要模
 
 ```ts
 import { readFileSync } from 'node:fs';
-import { extractArchiModelXml, parseArchiModel } from '@continuousarchitecture/archi-model-parser';
+import { extractArchiModelXml, parseArchiModel } from '@cda/archi-semantic-core';
 
 const bytes = readFileSync('MyModel.archimate');
 const xml = extractArchiModelXml(bytes); // 处理纯 XML 或压缩包（zip）两种情况
@@ -333,7 +333,7 @@ interface ArchiFeature {
 这个机制最广为人知的用法就是 [Label Expressions](https://github.com/archimatetool/archi/wiki/Label-Expressions)（`name="labelExpression"`），它可以自定义图表对象显示的文本，而不是单纯显示元素名称。有两个函数专门用于处理它：
 
 ```ts
-import { getLabelExpression, resolveLabelExpression } from '@continuousarchitecture/archi-model-parser';
+import { getLabelExpression, resolveLabelExpression } from '@cda/archi-semantic-core';
 
 const raw = getLabelExpression(node.features);
 // "${name}\n${property:First}" —— 模板本身，尚未求值
@@ -388,7 +388,7 @@ interface ArchiRelationship {
 
 ```ts
 import { readFileSync } from 'node:fs';
-import { extractArchiModelXml, parseArchiModel } from '@continuousarchitecture/archi-model-parser';
+import { extractArchiModelXml, parseArchiModel } from '@cda/archi-semantic-core';
 
 const bytes = readFileSync('MyModel.archimate'); // 按字节读取，而不是按文本读取
 const xml = extractArchiModelXml(bytes);
@@ -465,15 +465,15 @@ Node.js：
 }
 ```
 
-不支持 CommonJS 的 `require('@continuousarchitecture/archi-model-parser')` 用法。
+不支持 CommonJS 的 `require('@cda/archi-semantic-core')` 用法。
 
 现代浏览器打包工具同样可以使用这个包。
 
 ## 开发
 
 ```sh
-git clone https://github.com/ContinuousArchitecture/archi-model-parser.git
-cd archi-model-parser
+git clone https://github.com/Continuous-DrivenArchitecture/archi-semantic-core.git
+cd archi-semantic-core
 npm install
 
 npm run typecheck
@@ -484,11 +484,11 @@ npm pack --dry-run
 
 ## 设计原则
 
-`archi-model-parser` 应当理解**Archi 原生的模型语义**。
+`archi-semantic-core` 应当理解**Archi 原生的模型语义**。
 
 它不应该知道其他格式、渲染器、编辑器或交换标准选择如何表示这些语义。
 
-正是这条边界，让这个解析器能够作为其他 ContinuousArchitecture 工具的可复用基础。
+正是这条边界，让这个解析器能够作为其他 Continuous-DrivenArchitecture 工具的可复用基础。
 
 ## 许可证
 

@@ -1,7 +1,7 @@
 {
-  "name": "@continuousarchitecture/archi-model-parser",
-  "version": "0.4.0",
-  "description": "Parse Archi desktop editor's native .archimate XML files into a clean, well-typed TypeScript domain model.",
+  "name": "@cda/archi-semantic-core",
+  "version": "0.1.0",
+  "description": "The foundational semantic core of the Continuous-Driven Architecture (CDA) ecosystem. Translates native Archi files into an intelligent, typed domain graph ready for automated governance and GitOps pipelines.",
   "keywords": [
     "archimate",
     "archi",
@@ -44,10 +44,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ContinuousArchitecture/archi-model-parser.git"
+    "url": "git+https://github.com/Continuous-DrivenArchitecture/archi-semantic-core.git"
   },
-  "homepage": "https://github.com/ContinuousArchitecture/archi-model-parser#readme",
+  "homepage": "https://github.com/Continuous-DrivenArchitecture/archi-semantic-core#readme",
   "bugs": {
-    "url": "https://github.com/ContinuousArchitecture/archi-model-parser/issues"
+    "url": "https://github.com/Continuous-DrivenArchitecture/archi-semantic-core/issues"
   }
 }

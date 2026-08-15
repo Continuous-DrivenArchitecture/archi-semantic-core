@@ -1,13 +1,13 @@
-# archi-model-parser
+# archi-semantic-core
 
-[![npm version](https://img.shields.io/npm/v/@continuousarchitecture/archi-model-parser.svg)](https://www.npmjs.com/package/@continuousarchitecture/archi-model-parser) [![License: MIT](https://img.shields.io/npm/l/@continuousarchitecture/archi-model-parser.svg)](./LICENSE)
+[![npm version](https://img.shields.io/npm/v/@cda/archi-semantic-core.svg)](https://www.npmjs.com/package/@cda/archi-semantic-core) [![License: MIT](https://img.shields.io/npm/l/@cda/archi-semantic-core.svg)](./LICENSE)
 
 [<img src="https://flagcdn.com/20x15/gb.png" width="20" height="15" alt=""> ![English](https://img.shields.io/badge/English-4c9aff)](README.md) [<img src="https://flagcdn.com/20x15/de.png" width="20" height="15" alt=""> ![Deutsch](https://img.shields.io/badge/Deutsch-4c9aff)](README.de.md) [<img src="https://flagcdn.com/20x15/es.png" width="20" height="15" alt=""> ![Español](https://img.shields.io/badge/Español-4c9aff)](README.es.md) [<img src="https://flagcdn.com/20x15/fr.png" width="20" height="15" alt=""> ![Français](https://img.shields.io/badge/Français-4c9aff)](README.fr.md) [<img src="https://flagcdn.com/20x15/nl.png" width="20" height="15" alt=""> ![Nederlands](https://img.shields.io/badge/Nederlands-4c9aff)](README.nl.md) [<img src="https://flagcdn.com/20x15/pt.png" width="20" height="15" alt=""> ![Português](https://img.shields.io/badge/Português-4c9aff)](README.pt.md) [<img src="https://flagcdn.com/20x15/cn.png" width="20" height="15" alt=""> ![中文](https://img.shields.io/badge/中文-4c9aff)](README.zh.md)
 
 Ein TypeScript-Parser für native `.archimate`-Modelldateien, die mit dem
 Desktop-Editor [Archi](https://www.archimatetool.com/) erstellt wurden.
 
-`archi-model-parser` liest das native XML-Format von Archi und wandelt es in
+`archi-semantic-core` liest das native XML-Format von Archi und wandelt es in
 ein sauberes, stark typisiertes `ArchiModel` um, das Ordner, Elemente,
 Beziehungen, Views, Diagrammobjekte, Diagrammverbindungen, Notizen,
 Eigenschaften, visuelle Gestaltung, Specializations/Profiles sowie die
@@ -16,7 +16,7 @@ sind, ohne die interne XML-Struktur von Archi zu kennen. Außerdem liest es
 die ZIP-Archiv-Variante des `.archimate`-Dateiformats.
 
 ```text
-.archimate XML  →  archi-model-parser  →  ArchiModel
+.archimate XML  →  archi-semantic-core  →  ArchiModel
 ```
 
 ## Inhaltsverzeichnis
@@ -86,7 +86,7 @@ befürwortet.
 ## Installation
 
 ```sh
-npm install @continuousarchitecture/archi-model-parser
+npm install @cda/archi-semantic-core
 ```
 
 ## Verwendung
@@ -95,7 +95,7 @@ npm install @continuousarchitecture/archi-model-parser
 import {
   parseArchiModel,
   validateArchiModel,
-} from '@continuousarchitecture/archi-model-parser';
+} from '@cda/archi-semantic-core';
 
 const model = parseArchiModel(xml);
 
@@ -122,7 +122,7 @@ Sie die rohen Bytes ein und übergeben Sie sie zunächst an
 
 ```ts
 import { readFileSync } from 'node:fs';
-import { extractArchiModelXml, parseArchiModel } from '@continuousarchitecture/archi-model-parser';
+import { extractArchiModelXml, parseArchiModel } from '@cda/archi-semantic-core';
 
 const bytes = readFileSync('MyModel.archimate');
 const xml = extractArchiModelXml(bytes); // verarbeitet reines XML oder ein ZIP-Archiv
@@ -440,7 +440,7 @@ Die bekannteste Verwendung dieses Mechanismus sind
 anstelle des einfachen Elementnamens anzeigt. Zwei Funktionen arbeiten damit:
 
 ```ts
-import { getLabelExpression, resolveLabelExpression } from '@continuousarchitecture/archi-model-parser';
+import { getLabelExpression, resolveLabelExpression } from '@cda/archi-semantic-core';
 
 const raw = getLabelExpression(node.features);
 // "${name}\n${property:First}" — die Vorlage, unausgewertet
@@ -533,7 +533,7 @@ einem Text-Decoder zu lesen, würde sie unwiederbringlich beschädigen.
 
 ```ts
 import { readFileSync } from 'node:fs';
-import { extractArchiModelXml, parseArchiModel } from '@continuousarchitecture/archi-model-parser';
+import { extractArchiModelXml, parseArchiModel } from '@cda/archi-semantic-core';
 
 const bytes = readFileSync('MyModel.archimate'); // als Bytes lesen, nicht als Text
 const xml = extractArchiModelXml(bytes);
@@ -645,7 +645,7 @@ Das Paket ist ausschließlich als ESM verfügbar:
 }
 ```
 
-CommonJS `require('@continuousarchitecture/archi-model-parser')` wird nicht
+CommonJS `require('@cda/archi-semantic-core')` wird nicht
 unterstützt.
 
 Ein moderner Browser-Bundler kann das Paket ebenfalls verwenden.
@@ -653,8 +653,8 @@ Ein moderner Browser-Bundler kann das Paket ebenfalls verwenden.
 ## Entwicklung
 
 ```sh
-git clone https://github.com/ContinuousArchitecture/archi-model-parser.git
-cd archi-model-parser
+git clone https://github.com/Continuous-DrivenArchitecture/archi-semantic-core.git
+cd archi-semantic-core
 npm install
 
 npm run typecheck
@@ -665,13 +665,13 @@ npm pack --dry-run
 
 ## Designprinzip
 
-`archi-model-parser` soll **Archis native Modellsemantik** verstehen.
+`archi-semantic-core` soll **Archis native Modellsemantik** verstehen.
 
 Es soll nicht wissen, wie ein anderes Format, Renderer, Editor oder
 Austauschstandard diese Semantik repräsentiert.
 
 Diese Grenze hält den Parser als Grundlage für weitere
-ContinuousArchitecture-Werkzeuge wiederverwendbar.
+Continuous-DrivenArchitecture-Werkzeuge wiederverwendbar.
 
 ## Lizenz
 

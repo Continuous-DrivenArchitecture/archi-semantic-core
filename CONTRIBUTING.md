@@ -1,20 +1,20 @@
 # Contributing
 
-Thank you for helping improve `archi-model-parser`.
+Thank you for helping improve `archi-semantic-core`.
 
 ## Scope
 
 This repository parses Archi's **native** `.archimate` XML format into a
 typed `ArchiModel`. Per the README's [Design principle](README.md#design-principle):
 
-> `archi-model-parser` should understand **Archi's native model semantics**.
+> `archi-semantic-core` should understand **Archi's native model semantics**.
 > It should not know how another format, renderer, editor, or exchange
 > standard chooses to represent those semantics.
 
 In practice this means:
 
 - No ArchiMate® Model Exchange File Format conversion here — that lives in
-  [`archi-open-exchange`](https://github.com/ContinuousArchitecture/archi-open-exchange),
+  [`archi-open-exchange`](https://github.com/Continuous-DrivenArchitecture/archi-open-exchange),
   which consumes this package's `ArchiModel` output.
 - No rendering, diagramming, UI, or editing features.
 - No lookup helpers, caching layers, or convenience APIs beyond a faithful,
@@ -22,7 +22,7 @@ In practice this means:
 
 If a change sounds like it belongs to conversion, rendering, or an
 end-user tool instead, it likely belongs in a sibling
-[ContinuousArchitecture](https://github.com/ContinuousArchitecture) repo,
+[Continuous-DrivenArchitecture](https://github.com/Continuous-DrivenArchitecture) repo,
 not here.
 
 ## Before contributing
@@ -35,8 +35,8 @@ something that will be declined for being out of scope.
 ## Development setup
 
 ```sh
-git clone https://github.com/ContinuousArchitecture/archi-model-parser.git
-cd archi-model-parser
+git clone https://github.com/Continuous-DrivenArchitecture/archi-semantic-core.git
+cd archi-semantic-core
 npm install
 
 npm run typecheck
@@ -121,7 +121,7 @@ files — follow the existing pattern rather than re-deriving it):
   language) identical, byte-for-byte, across all seven files.
 
 CONTRIBUTING.md itself is English-only, matching the convention used across
-the other ContinuousArchitecture repos.
+the other Continuous-DrivenArchitecture repos.
 
 ## Commits and pull requests
 
