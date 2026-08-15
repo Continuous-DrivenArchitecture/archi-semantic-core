@@ -1,10 +1,9 @@
-import { readFile, mkdir, writeFile, access } from 'node:fs/promises';
+import { readFile, mkdir, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { makeBadge } from 'badge-maker';
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
-const force = process.argv.includes('--force');
 
 const languages = [
   { code: 'en', label: 'English', flag: 'gb.svg', readme: 'README.md' },
@@ -15,6 +14,9 @@ const languages = [
   { code: 'pt', label: 'Português', flag: 'pt.svg', readme: 'README.pt.md' },
   { code: 'zh', label: '中文', flag: 'cn.svg', readme: 'README.zh.md' },
 ];
+
+const ACTIVE_COLOR = '4c9aff';
+const INACTIVE_COLOR = '6b7280';
 
 let pkg;
 try {
@@ -39,36 +41,31 @@ async function writeBadge(file, data) {
   }
 }
 
+async function readFlag(flag) {
+  try {
+    return await readFile(join(flagsDir, flag), 'utf8');
+  } catch (err) {
+    console.error(`generate-badges: could not read docs/flags/${flag}: ${err.message}`);
+    process.exit(1);
+  }
+}
+
 await writeBadge('version.svg', { label: 'npm', message: `v${pkg.version}` });
 await writeBadge('license.svg', { label: 'license', message: pkg.license });
 
 for (const language of languages) {
-  const file = `lang-${language.code}.svg`;
-  if (!force) {
-    try {
-      await access(join(badgesDir, file));
-      console.log(`generate-badges: keeping existing docs/badges/${file}`);
-      continue;
-    } catch {
-      // badge does not exist yet — generate it
-    }
-  }
-
-  let flagSvg;
-  try {
-    flagSvg = await readFile(join(flagsDir, language.flag), 'utf8');
-  } catch (err) {
-    console.error(
-      `generate-badges: could not read docs/flags/${language.flag}: ${err.message}`
-    );
-    process.exit(1);
-  }
-
+  const flagSvg = await readFlag(language.flag);
   const logoBase64 = `data:image/svg+xml;base64,${Buffer.from(flagSvg).toString('base64')}`;
 
-  await writeBadge(file, {
+  await writeBadge(`lang-${language.code}.svg`, {
     message: language.label,
-    color: '4c9aff',
+    color: INACTIVE_COLOR,
+    logoBase64,
+  });
+
+  await writeBadge(`lang-${language.code}-active.svg`, {
+    message: language.label,
+    color: ACTIVE_COLOR,
     logoBase64,
   });
 }
