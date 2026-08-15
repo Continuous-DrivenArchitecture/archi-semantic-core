@@ -50,6 +50,7 @@ formato `.archimate`.
 - [Requisitos e formato de módulo](#requisitos-e-formato-de-módulo)
 - [Desenvolvimento](#desenvolvimento)
 - [Princípio de design](#princípio-de-design)
+- [Achou útil?](#achou-útil)
 - [Licença](#licença)
 
 ## Para que serve este pacote
@@ -667,6 +668,13 @@ intercâmbio escolhe representar essa semântica.
 
 Essa fronteira mantém o parser reutilizável como base para outras
 ferramentas da Continuous-DrivenArchitecture.
+
+## Achou útil?
+
+Se o `archi-semantic-core` poupou você de ter que fazer engenharia reversa do
+formato `.archimate` nativo do Archi por conta própria, considere dar uma ⭐
+ao projeto. Isso ajuda outros desenvolvedores que trabalham com Archi a
+descobri-lo.
 
 ## Licença
 

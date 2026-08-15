@@ -49,6 +49,7 @@ kennen. Het leest ook de zip-archiefvariant van het `.archimate`-bestandsformaat
 - [Vereisten en moduleformaat](#vereisten-en-moduleformaat)
 - [Ontwikkeling](#ontwikkeling)
 - [Ontwerpprincipe](#ontwerpprincipe)
+- [Handig gevonden?](#handig-gevonden)
 - [Licentie](#licentie)
 
 ## Waarvoor dit pakket dient
@@ -667,6 +668,13 @@ uitwisselingsstandaard ervoor kiest om die semantiek weer te geven.
 
 Die grens houdt de parser herbruikbaar als fundament voor andere tooling van
 Continuous-DrivenArchitecture.
+
+## Handig gevonden?
+
+Als `archi-semantic-core` je ervoor behoedde om zelf het native
+`.archimate`-formaat van Archi te reverse-engineeren, overweeg dan om het
+project een ⭐ te geven. Het helpt andere ontwikkelaars die met Archi werken
+om het te ontdekken.
 
 ## Licentie
 

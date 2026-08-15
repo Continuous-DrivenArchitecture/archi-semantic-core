@@ -49,6 +49,7 @@ reads the zip-archive variant of the `.archimate` file format.
 - [Requirements and module format](#requirements-and-module-format)
 - [Development](#development)
 - [Design principle](#design-principle)
+- [Found this useful?](#found-this-useful)
 - [License](#license)
 
 ## What this package is for
@@ -639,6 +640,12 @@ chooses to represent those semantics.
 
 That boundary keeps the parser reusable as a foundation for other
 Continuous-DrivenArchitecture tooling.
+
+## Found this useful?
+
+If `archi-semantic-core` saved you from having to reverse-engineer Archi's
+native `.archimate` format yourself, consider giving the project a ⭐. It
+helps other developers working with Archi discover it.
 
 ## License
 

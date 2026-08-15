@@ -50,6 +50,7 @@ de Archi. También lee la variante comprimida (zip) del formato `.archimate`.
 - [Requisitos y formato de módulo](#requisitos-y-formato-de-módulo)
 - [Desarrollo](#desarrollo)
 - [Principio de diseño](#principio-de-diseño)
+- [¿Te resultó útil?](#te-resultó-útil)
 - [Licencia](#licencia)
 
 ## Para qué sirve este paquete
@@ -659,6 +660,13 @@ decide representar esa semántica.
 
 Esa frontera mantiene al parser reutilizable como base para otras herramientas
 de Continuous-DrivenArchitecture.
+
+## ¿Te resultó útil?
+
+Si `archi-semantic-core` te ahorró tener que hacer ingeniería inversa del
+formato `.archimate` nativo de Archi por tu cuenta, considera darle una ⭐
+al proyecto. Ayuda a que otros desarrolladores que trabajan con Archi lo
+descubran.
 
 ## Licencia
 

@@ -50,6 +50,7 @@ die ZIP-Archiv-Variante des `.archimate`-Dateiformats.
 - [Anforderungen und Modulformat](#anforderungen-und-modulformat)
 - [Entwicklung](#entwicklung)
 - [Designprinzip](#designprinzip)
+- [Nützlich gefunden?](#nützlich-gefunden)
 - [Lizenz](#lizenz)
 
 ## Wofür dieses Paket gedacht ist
@@ -672,6 +673,12 @@ Austauschstandard diese Semantik repräsentiert.
 
 Diese Grenze hält den Parser als Grundlage für weitere
 Continuous-DrivenArchitecture-Werkzeuge wiederverwendbar.
+
+## Nützlich gefunden?
+
+Wenn `archi-semantic-core` dir erspart hat, Archis natives `.archimate`-Format
+selbst per Reverse Engineering zu entschlüsseln, gib dem Projekt doch einen ⭐.
+Es hilft anderen Entwicklern, die mit Archi arbeiten, es zu entdecken.
 
 ## Lizenz
 

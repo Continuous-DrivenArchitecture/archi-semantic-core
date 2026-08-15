@@ -50,6 +50,7 @@ du format de fichier `.archimate`.
 - [Prérequis et format de module](#prérequis-et-format-de-module)
 - [Développement](#développement)
 - [Principe de conception](#principe-de-conception)
+- [Ça vous a été utile ?](#ça-vous-a-été-utile)
 - [Licence](#licence)
 
 ## À quoi sert ce paquet
@@ -681,6 +682,12 @@ standard d'échange choisit de représenter cette sémantique.
 
 Cette frontière permet au parseur de rester réutilisable comme fondation
 pour d'autres outils Continuous-DrivenArchitecture.
+
+## Ça vous a été utile ?
+
+Si `archi-semantic-core` vous a évité d'avoir à faire de la rétro-ingénierie du
+format `.archimate` natif d'Archi vous-même, pensez à mettre une ⭐ au projet.
+Cela aide d'autres développeurs travaillant avec Archi à le découvrir.
 
 ## Licence
 
