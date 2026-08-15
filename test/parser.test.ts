@@ -38,6 +38,7 @@ describe('parseArchiModel — minimal model', () => {
         folderPath: 'Business',
         documentation: null,
         properties: [],
+        profiles: [],
         junctionType: null,
         rawJunctionType: null,
       },
@@ -153,6 +154,11 @@ describe('parseArchiModel — views, diagram objects, nested objects, connection
     expect(view.noteIds).toEqual(['note-1']);
   });
 
+  it('leaves connectionRouterType null when the native attribute is absent', () => {
+    const [view] = model.views;
+    expect(view.connectionRouterType).toBeNull();
+  });
+
   it('nests a diagram object inside its parent (bug fix: CA-Stack always returned [])', () => {
     const source = model.diagramObjects.find((obj) => obj.id === 'vis-source')!;
     expect(source.parentId).toBeNull();
@@ -187,6 +193,8 @@ describe('parseArchiModel — views, diagram objects, nested objects, connection
         bounds: { x: 15, y: 90, width: 50, height: 20 },
         textAlignment: null,
         borderType: null,
+        style: null,
+        features: [],
       },
     ]);
   });
@@ -230,6 +238,11 @@ describe('parseArchiModel — documentation, properties, and Group containers', 
     expect(view.viewpoint).toBe('layered');
   });
 
+  it('reads the native connectionRouterType code verbatim, without decoding it to a named enum', () => {
+    const view = model.views.find((v) => v.id === 'view-details')!;
+    expect(view.connectionRouterType).toBe(2);
+  });
+
   it('reads a DiagramModelReference node\'s referencedModelId, distinguishing it from a Group', () => {
     const modelRef = model.diagramObjects.find((obj) => obj.id === 'visual-modelref')!;
     expect(modelRef.xsiType).toBe('archimate:DiagramModelReference');
@@ -259,11 +272,140 @@ describe('parseArchiModel — documentation, properties, and Group containers', 
     expect(view.diagramObjectIds).toContain('visual-group');
   });
 
-  it('is not confused by unmodeled presentational attributes (fillColor, font, feature, numeric type)', () => {
+  it('is not confused by other presentational attributes (feature, numeric type)', () => {
     const visualSharedA = model.diagramObjects.find((obj) => obj.id === 'visual-shared-a')!;
     expect(visualSharedA.archimateElementId).toBe('element-shared');
     expect(visualSharedA.textAlignment).toBe('1');
     expect(visualSharedA.textPosition).toBe('1');
+  });
+
+  it('decodes fillColor/lineColor/fontColor, the font name/size/style bitmask, and alpha', () => {
+    const visualSharedA = model.diagramObjects.find((obj) => obj.id === 'visual-shared-a')!;
+    expect(visualSharedA.style).toEqual({
+      fillColor: '#ffffff',
+      lineColor: '#ff0000',
+      fontColor: '#000000',
+      font: '1|Segoe UI|9.0|1|WINDOWS|1|-15|0|0|0|700|0|0|0|0|3|2|1|34|Segoe UI',
+      fontName: 'Segoe UI',
+      fontSize: 9.0,
+      fontStyle: { bold: true, italic: false },
+      lineWidth: null,
+      alpha: 200,
+    });
+  });
+
+  it('reads a style with only some attributes set, leaving the rest null', () => {
+    const visualSharedB = model.diagramObjects.find((obj) => obj.id === 'visual-shared-b')!;
+    expect(visualSharedB.style).toEqual({
+      fillColor: '#ffcccc',
+      lineColor: null,
+      fontColor: null,
+      font: null,
+      fontName: null,
+      fontSize: null,
+      fontStyle: null,
+      lineWidth: null,
+      alpha: null,
+    });
+  });
+
+  it('reads style on a diagram connection, where alpha is always null (a Connection has no fill)', () => {
+    const connection = model.diagramConnections.find((conn) => conn.id === 'visual-relationship')!;
+    expect(connection.style).toEqual({
+      fillColor: null,
+      lineColor: '#0000ff',
+      fontColor: '#0000ff',
+      font: null,
+      fontName: null,
+      fontSize: null,
+      fontStyle: null,
+      lineWidth: 2,
+      alpha: null,
+    });
+  });
+
+  it('leaves style null when no fillColor/lineColor/fontColor/font attribute is present', () => {
+    const visualEmpty = model.diagramObjects.find((obj) => obj.id === 'visual-empty')!;
+    expect(visualEmpty.style).toBeNull();
+  });
+
+  it('reads a generic <feature name value> entry (e.g. labelExpression)', () => {
+    const visualSharedA = model.diagramObjects.find((obj) => obj.id === 'visual-shared-a')!;
+    expect(visualSharedA.features).toEqual([{ name: 'labelExpression', value: '${name}\n${property:First}' }]);
+  });
+
+  it('leaves features empty when no <feature> child is present', () => {
+    const visualEmpty = model.diagramObjects.find((obj) => obj.id === 'visual-empty')!;
+    expect(visualEmpty.features).toEqual([]);
+  });
+
+  it('reads the native figureType (alternate figure/icon selector)', () => {
+    const visualSharedA = model.diagramObjects.find((obj) => obj.id === 'visual-shared-a')!;
+    const visualSharedB = model.diagramObjects.find((obj) => obj.id === 'visual-shared-b')!;
+    expect(visualSharedA.figureType).toBe('1');
+    expect(visualSharedB.figureType).toBe('0');
+  });
+
+  it('leaves figureType null when the native type attribute is absent', () => {
+    const visualEmpty = model.diagramObjects.find((obj) => obj.id === 'visual-empty')!;
+    expect(visualEmpty.figureType).toBeNull();
+  });
+
+  it('reads documentation set directly on a Group visual object', () => {
+    const group = model.diagramObjects.find((obj) => obj.id === 'visual-group')!;
+    expect(group.documentation).toBe('Visual group documentation');
+  });
+
+  it('leaves documentation null on an element-backed DiagramObject (it lives on the element instead)', () => {
+    const visualSharedA = model.diagramObjects.find((obj) => obj.id === 'visual-shared-a')!;
+    expect(visualSharedA.documentation).toBeNull();
+  });
+});
+
+describe('parseArchiModel — font style bitmask decoding', () => {
+  function diagramObjectWithFont(font: string) {
+    const xml = `${XML_HEADER}
+<archimate:model ${NS} name="Font Model" id="model-font" version="5.0.0">
+  <folder name="Views" id="folder-views" type="diagrams">
+    <element xsi:type="archimate:ArchimateDiagramModel" name="View" id="view-1">
+      <child xsi:type="archimate:Group" id="visual-1" name="G" font="${font}">
+        <bounds x="0" y="0" width="10" height="10"/>
+      </child>
+    </element>
+  </folder>
+</archimate:model>`;
+    const model = parseArchiModel(xml);
+    return model.diagramObjects.find((obj) => obj.id === 'visual-1')!;
+  }
+
+  it('decodes italic (bit 1) without bold', () => {
+    const obj = diagramObjectWithFont('1|Arial|10.0|2|WINDOWS');
+    expect(obj.style?.fontStyle).toEqual({ bold: false, italic: true });
+  });
+
+  it('decodes bold+italic combined (bits 0 and 1)', () => {
+    const obj = diagramObjectWithFont('1|Arial|10.0|3|WINDOWS');
+    expect(obj.style?.fontStyle).toEqual({ bold: true, italic: true });
+  });
+
+  it('decodes plain (style 0)', () => {
+    const obj = diagramObjectWithFont('1|Arial|10.0|0|WINDOWS');
+    expect(obj.style?.fontStyle).toEqual({ bold: false, italic: false });
+  });
+
+  it('falls back to null structured fields (but keeps the raw string) for an unrecognized font shape', () => {
+    const obj = diagramObjectWithFont('not-a-swt-fontdata-string');
+    expect(obj.style).toEqual({
+      fillColor: null,
+      lineColor: null,
+      fontColor: null,
+      font: 'not-a-swt-fontdata-string',
+      fontName: null,
+      fontSize: null,
+      fontStyle: null,
+      lineWidth: null,
+      alpha: null,
+    });
   });
 });
 
@@ -315,6 +457,82 @@ describe('parseArchiModel — broad type coverage', () => {
   it('keeps an empty folder that has a type but no contents', () => {
     const implementation = model.folders.find((f) => f.type === 'implementation_migration')!;
     expect(implementation.containedIds).toEqual([]);
+  });
+});
+
+describe('parseArchiModel — Specializations and Profiles', () => {
+  function modelWithProfiles(profileXml: string, elementExtra: string, relationshipExtra = ''): ReturnType<typeof parseArchiModel> {
+    const xml = `${XML_HEADER}
+<archimate:model ${NS} name="Profiles Model" id="model-profiles" version="5.0.0">
+  <folder name="Business" id="folder-business" type="business">
+    <element xsi:type="archimate:BusinessActor" name="A" id="element-a" ${elementExtra}/>
+    <element xsi:type="archimate:BusinessActor" name="B" id="element-b"/>
+  </folder>
+  <folder name="Relations" id="folder-rel" type="relations">
+    <element xsi:type="archimate:ServingRelationship" id="rel-1" source="element-a" target="element-b" ${relationshipExtra}/>
+  </folder>
+  ${profileXml}
+</archimate:model>`;
+    return parseArchiModel(xml);
+  }
+
+  it('reads a <profile> element with every attribute set', () => {
+    const model = modelWithProfiles(
+      '<profile name="Web Application" id="profile-1" conceptType="ApplicationComponent" specialization="true" imagePath="images/abc.png"/>',
+      '',
+    );
+    expect(model.profiles).toEqual([
+      { id: 'profile-1', name: 'Web Application', conceptType: 'ApplicationComponent', specialization: true, imagePath: 'images/abc.png' },
+    ]);
+  });
+
+  it('defaults specialization to true when the native attribute is absent (EMF default)', () => {
+    const model = modelWithProfiles('<profile name="Web Application" id="profile-1" conceptType="ApplicationComponent"/>', '');
+    expect(model.profiles[0]?.specialization).toBe(true);
+  });
+
+  it('honors an explicit specialization="false" (a generic Profile, not a Specialization)', () => {
+    const model = modelWithProfiles('<profile name="Cost" id="profile-1" specialization="false"/>', '');
+    expect(model.profiles[0]).toEqual({ id: 'profile-1', name: 'Cost', conceptType: null, specialization: false, imagePath: null });
+  });
+
+  it('returns an empty profiles array when the model declares none', () => {
+    const model = modelWithProfiles('', '');
+    expect(model.profiles).toEqual([]);
+  });
+
+  it('reads a single profile reference on an element', () => {
+    const model = modelWithProfiles(
+      '<profile name="Web Application" id="profile-1" conceptType="ApplicationComponent"/>',
+      'profiles="profile-1"',
+    );
+    const elementA = model.elements.find((el) => el.id === 'element-a')!;
+    expect(elementA.profiles).toEqual(['profile-1']);
+  });
+
+  it('reads multiple space-separated profile references on an element', () => {
+    const model = modelWithProfiles(
+      '<profile name="Web Application" id="profile-1"/><profile name="Cost" id="profile-2" specialization="false"/>',
+      'profiles="profile-1 profile-2"',
+    );
+    const elementA = model.elements.find((el) => el.id === 'element-a')!;
+    expect(elementA.profiles).toEqual(['profile-1', 'profile-2']);
+  });
+
+  it('leaves profiles empty on an element with no profiles attribute', () => {
+    const model = modelWithProfiles('', '');
+    const elementB = model.elements.find((el) => el.id === 'element-b')!;
+    expect(elementB.profiles).toEqual([]);
+  });
+
+  it('reads profile references on a relationship too (ArchimateConcept, not just ArchimateElement)', () => {
+    const model = modelWithProfiles(
+      '<profile name="Critical" id="profile-1"/>',
+      '',
+      'profiles="profile-1"',
+    );
+    const relationship = model.relationships.find((rel) => rel.id === 'rel-1')!;
+    expect(relationship.profiles).toEqual(['profile-1']);
   });
 });
 

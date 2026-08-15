@@ -30,6 +30,8 @@ export interface ArchiRelationship {
   folderPath: string;
   documentation: string | null;
   properties: ArchiProperty[];
+  /** Ids of `ArchiProfile` entries (Specializations/Profiles) this relationship references, via the native `profiles` attribute. Empty when none are set. */
+  profiles: string[];
   /**
    * `AccessRelationship`'s access mode. `null` for every other relationship
    * type; always resolved to a value (defaulting to `'Write'`, Archi's own

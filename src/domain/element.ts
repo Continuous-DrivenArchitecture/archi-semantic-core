@@ -22,6 +22,8 @@ export interface ArchiElement {
   folderPath: string;
   documentation: string | null;
   properties: ArchiProperty[];
+  /** Ids of `ArchiProfile` entries (Specializations/Profiles) this element references, via the native `profiles` attribute. Empty when none are set. */
+  profiles: string[];
   /**
    * Junction's native AND/OR discriminator, decoded from the native `type`
    * attribute: absent/`""` -> `'And'` (Archi's documented default), `"or"`

@@ -4,6 +4,7 @@ import type { ArchiRelationship } from './relationship.js';
 import type { ArchiView } from './view.js';
 import type { ArchiDiagramObject, ArchiDiagramConnection, ArchiNote } from './diagram.js';
 import type { ArchiProperty } from './property.js';
+import type { ArchiProfile } from './profile.js';
 
 /** Top-level metadata read from the `<archimate:model>` root element. */
 export interface ArchiModelMetadata {
@@ -38,4 +39,6 @@ export interface ArchiModel {
   diagramObjects: ArchiDiagramObject[];
   diagramConnections: ArchiDiagramConnection[];
   notes: ArchiNote[];
+  /** Specializations and generic Profiles declared at the model root — see {@link ArchiProfile}. */
+  profiles: ArchiProfile[];
 }

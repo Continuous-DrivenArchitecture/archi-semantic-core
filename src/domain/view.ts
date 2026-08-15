@@ -19,6 +19,17 @@ export interface ArchiView {
    * empty string, meaning "no viewpoint restriction").
    */
   viewpoint: string | null;
+  /**
+   * Native `connectionRouterType` attribute — Archi's own numeric code for
+   * how connections are routed in this view (`IDiagramModel.CONNECTION_ROUTER_BENDPOINT
+   * = 0`, the default, manual bendpoints; `CONNECTION_ROUTER_MANHATTAN = 2`,
+   * orthogonal routing; Archi's source reserves `1` as a removed, unused
+   * option). Preserved as the raw number rather than decoded to a named
+   * enum, like `ArchiDiagramObject.figureType` — its meaning is
+   * Archi-UI-specific and the numbering has already changed once. `null`
+   * when absent (Archi's own default is `0`, meaning "manual bendpoints").
+   */
+  connectionRouterType: number | null;
   /** Ids of diagram objects that are direct children of the view (not nested). */
   diagramObjectIds: string[];
   /** Ids of every diagram connection anywhere within this view, regardless of nesting depth. */

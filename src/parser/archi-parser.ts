@@ -6,6 +6,8 @@ import type { ArchiRelationship, ArchiAccessType } from '../domain/relationship.
 import type { ArchiView } from '../domain/view.js';
 import type { ArchiDiagramObject, ArchiDiagramConnection, ArchiNote, ArchiBounds, ArchiBendpoint } from '../domain/diagram.js';
 import type { ArchiProperty } from '../domain/property.js';
+import type { ArchiFeature } from '../domain/feature.js';
+import type { ArchiProfile } from '../domain/profile.js';
 import {
   asArray,
   attr,
@@ -16,6 +18,7 @@ import {
   deriveSemanticType,
   type XmlNode,
 } from './xml-utils.js';
+import { extractStyle } from './style-utils.js';
 
 const VIEW_TYPE_PATTERN = /ArchimateDiagramModel$/i;
 const RELATIONSHIP_TYPE_PATTERN = /Relationship$/i;
@@ -108,6 +111,38 @@ function extractProperties(node: XmlNode): ArchiProperty[] {
     .filter((prop) => prop.key.length > 0);
 }
 
+function extractFeatures(node: XmlNode): ArchiFeature[] {
+  return (asArray(node.feature) as XmlNode[])
+    .map((feature) => ({ name: text(attr(feature, 'name')), value: text(attr(feature, 'value')) }))
+    .filter((feature) => feature.name.length > 0);
+}
+
+/** Reads the native `profiles` attribute (a space-separated `IDREFS` list — EMF's standard serialization for a multi-valued reference feature) into individual profile ids. */
+function extractProfileRefs(node: XmlNode): string[] {
+  const raw = readOptionalText(attr(node, 'profiles'));
+  return raw === null ? [] : raw.split(/\s+/).filter((id) => id.length > 0);
+}
+
+/**
+ * Reads the model root's `<profile>` elements — Specializations and generic
+ * Profiles (see {@link ArchiProfile}). `specialization` defaults to `true`
+ * (Archi's own documented EMF default for this attribute) when absent from
+ * the source XML, matching how EMF/XMI serialization omits attributes that
+ * equal their declared default value.
+ */
+function extractProfiles(node: XmlNode): ArchiProfile[] {
+  return (asArray(node.profile) as XmlNode[]).map((profile) => {
+    const rawSpecialization = attr(profile, 'specialization');
+    return {
+      id: text(attr(profile, 'id')),
+      name: readOptionalText(attr(profile, 'name')),
+      conceptType: readOptionalText(attr(profile, 'conceptType')),
+      specialization: rawSpecialization === undefined ? true : text(rawSpecialization) === 'true',
+      imagePath: readOptionalText(attr(profile, 'imagePath')),
+    };
+  });
+}
+
 /** Appends `id` to the bucket for `key`, creating the bucket on first use. */
 function pushToIndex(index: Map<string, string[]>, key: string, id: string): void {
   const bucket = index.get(key);
@@ -173,6 +208,8 @@ export function parseArchiModel(xmlText: string): ArchiModel {
         targetId: text(attr(conn, 'target')),
         archimateRelationshipId: readOptionalText(attr(conn, 'archimateRelationship')) ?? readOptionalText(attr(conn, 'relationship')),
         bendpoints: extractBendpoints(conn),
+        style: extractStyle(conn),
+        features: extractFeatures(conn),
       });
     }
   }
@@ -202,6 +239,8 @@ export function parseArchiModel(xmlText: string): ArchiModel {
           bounds: extractBounds(child),
           textAlignment: readOptionalText(attr(child, 'textAlignment')),
           borderType: readOptionalText(attr(child, 'borderType')),
+          style: extractStyle(child),
+          features: extractFeatures(child),
         });
         continue;
       }
@@ -225,6 +264,10 @@ export function parseArchiModel(xmlText: string): ArchiModel {
         bounds: extractBounds(child),
         textPosition: readOptionalText(attr(child, 'textPosition')),
         textAlignment: readOptionalText(attr(child, 'textAlignment')),
+        figureType: readOptionalText(attr(child, 'type')),
+        documentation: extractDocumentation(child),
+        style: extractStyle(child),
+        features: extractFeatures(child),
         childrenIds: [],
         connectionIds: [],
       });
@@ -273,6 +316,7 @@ export function parseArchiModel(xmlText: string): ArchiModel {
           documentation,
           properties,
           viewpoint: readOptionalText(attr(element, 'viewpoint')),
+          connectionRouterType: readOptionalNumber(attr(element, 'connectionRouterType')),
           diagramObjectIds: [],
           diagramConnectionIds: [],
           noteIds: [],
@@ -291,6 +335,7 @@ export function parseArchiModel(xmlText: string): ArchiModel {
           folderPath: path,
           documentation,
           properties,
+          profiles: extractProfileRefs(element),
           accessType: semanticType === 'AccessRelationship' ? decodeAccessType(attr(element, 'accessType')) : null,
           strength: semanticType === 'InfluenceRelationship' ? readOptionalText(attr(element, 'strength')) : null,
           directed: semanticType === 'AssociationRelationship' ? decodeDirected(attr(element, 'directed')) : null,
@@ -307,6 +352,7 @@ export function parseArchiModel(xmlText: string): ArchiModel {
           folderPath: path,
           documentation,
           properties,
+          profiles: extractProfileRefs(element),
           junctionType: rawJunctionType !== null ? decodeJunctionType(rawJunctionType) : null,
           rawJunctionType,
         });
@@ -372,5 +418,7 @@ export function parseArchiModel(xmlText: string): ArchiModel {
     properties: extractProperties(root),
   };
 
-  return { metadata, folders, elements, relationships, views, diagramObjects, diagramConnections, notes };
+  const profiles = extractProfiles(root);
+
+  return { metadata, folders, elements, relationships, views, diagramObjects, diagramConnections, notes, profiles };
 }
