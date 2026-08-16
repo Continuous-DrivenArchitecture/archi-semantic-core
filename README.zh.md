@@ -40,6 +40,7 @@
 - [Zip 归档 `.archimate` 文件](#zip-归档-archimate-文件)
 - [验证](#验证)
 - [性能](#性能)
+- [示例](#示例)
 - [已覆盖的内容](#已覆盖的内容)
 - [不在范围内的内容](#不在范围内的内容)
 - [环境要求和模块格式](#环境要求和模块格式)
@@ -430,6 +431,10 @@ const model = parseArchiModel(xml);
 解析和验证与模型大小呈**线性**关系：id 和交叉引用在单次 `Map`/`Set` 遍历中一次性完成索引，因此没有任何代码路径会逐条重新扫描 `model.elements`/`model.relationships`。`resolveLabelExpression` 是**每个节点 O(1)**——它的元素/关系查找通过按模型缓存的 `Map` 索引进行，因此为大型模型中的所有图表对象解析 label expressions 依然成本低廉。
 
 一个性能回归测试（`test/performance.test.ts`）强制执行这一保证：它在一个固定的时间预算内解析并验证一个包含 20,000 个元素、20,000 个关系和 20,000 个图表对象的合成模型，并检查当模型规模翻倍时解析时间呈线性增长。
+
+## 示例
+
+可直接复制的解析结果消费示例——读取 `.archimate` 文件（XML 或 zip）、索引与查询、基于关系图的影晌分析、作为流水线闸门的验证，以及 label expressions 的求值。参见 [examples/README.md](examples/README.md)。
 
 ## 已覆盖的内容
 

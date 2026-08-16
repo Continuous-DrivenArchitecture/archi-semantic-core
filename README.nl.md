@@ -46,6 +46,7 @@ kennen. Het leest ook de zip-archiefvariant van het `.archimate`-bestandsformaat
 - [Gecomprimeerde `.archimate`-bestanden (zip)](#gecomprimeerde-archimate-bestanden-zip)
 - [Validatie](#validatie)
 - [Prestaties](#prestaties)
+- [Voorbeelden](#voorbeelden)
 - [Wat wordt ondersteund](#wat-wordt-ondersteund)
 - [Wat buiten scope valt](#wat-buiten-scope-valt)
 - [Vereisten en moduleformaat](#vereisten-en-moduleformaat)
@@ -598,6 +599,13 @@ af: het parst en valideert een synthetisch model van 20.000 elementen,
 20.000 relaties en 20.000 diagramobjects binnen een vast tijdsbudget, en
 controleert dat de parse-tijd lineair groeit wanneer de modelgrootte
 verdubbelt.
+
+## Voorbeelden
+
+Kopieerklare consumptie-recepten voor het geparste model — `.archimate`-
+bestanden lezen (XML of zip), indexeren en bevragen, impactanalyse over de
+relatiegraaf, validatie als pipeline-gate en het oplossen van label
+expressions. Zie [examples/README.md](examples/README.md).
 
 ## Wat wordt ondersteund
 

@@ -47,6 +47,7 @@ formato `.archimate`.
 - [Arquivos `.archimate` compactados (zip)](#arquivos-archimate-compactados-zip)
 - [Validação](#validação)
 - [Desempenho](#desempenho)
+- [Exemplos](#exemplos)
 - [O que é coberto](#o-que-é-coberto)
 - [O que está fora do escopo](#o-que-está-fora-do-escopo)
 - [Requisitos e formato de módulo](#requisitos-e-formato-de-módulo)
@@ -598,6 +599,13 @@ isso: ele faz parse e validação de um modelo sintético com 20.000
 elementos, 20.000 relacionamentos e 20.000 diagram objects dentro de um
 orçamento de tempo fixo, e verifica que o tempo de parsing cresce
 linearmente quando o tamanho do modelo dobra.
+
+## Exemplos
+
+Receitas de consumo prontas para copiar do modelo analisado — leitura de
+arquivos `.archimate` (XML ou zip), indexação e consultas, análise de
+impacto sobre o grafo de relacionamentos, validação como porta de pipeline
+e resolução de label expressions. Ver [examples/README.md](examples/README.md).
 
 ## O que é coberto
 

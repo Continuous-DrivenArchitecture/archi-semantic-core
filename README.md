@@ -46,6 +46,7 @@ reads the zip-archive variant of the `.archimate` file format.
 - [Zip-archive `.archimate` files](#zip-archive-archimate-files)
 - [Validation](#validation)
 - [Performance](#performance)
+- [Examples](#examples)
 - [What's covered](#whats-covered)
 - [What's out of scope](#whats-out-of-scope)
 - [Requirements and module format](#requirements-and-module-format)
@@ -572,6 +573,13 @@ A performance regression test (`test/performance.test.ts`) enforces this:
 it parses and validates a synthetic model of 20k elements, 20k
 relationships, and 20k diagram objects within a fixed time budget, and
 checks that parse time grows linearly when the model size doubles.
+
+## Examples
+
+Ready-to-copy consumption recipes for the parsed model — reading
+`.archimate` files (XML or zip), indexing and querying, impact analysis
+over the relationship graph, validation as a pipeline gate, and label
+expression resolution. See [examples/README.md](examples/README.md).
 
 ## What's covered
 

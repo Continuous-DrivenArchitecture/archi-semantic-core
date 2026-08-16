@@ -47,6 +47,7 @@ du format de fichier `.archimate`.
 - [Fichiers `.archimate` compressés (zip)](#fichiers-archimate-compressés-zip)
 - [Validation](#validation)
 - [Performances](#performances)
+- [Exemples](#exemples)
 - [Ce qui est couvert](#ce-qui-est-couvert)
 - [Ce qui est hors périmètre](#ce-qui-est-hors-périmètre)
 - [Prérequis et format de module](#prérequis-et-format-de-module)
@@ -612,6 +613,14 @@ respecter cette garantie : il analyse et valide un modèle synthétique de
 20 000 éléments, 20 000 relations et 20 000 diagram objects dans un budget
 de temps fixe, et vérifie que le temps d'analyse croît linéairement lorsque
 la taille du modèle double.
+
+## Exemples
+
+Recettes de consommation prêtes à copier pour le modèle analysé — lecture
+de fichiers `.archimate` (XML ou zip), indexation et requêtes, analyse
+d'impact sur le graphe de relations, validation comme passerelle de
+pipeline et résolution des label expressions. Voir
+[examples/README.md](examples/README.md).
 
 ## Ce qui est couvert
 

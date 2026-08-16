@@ -47,6 +47,7 @@ de Archi. También lee la variante comprimida (zip) del formato `.archimate`.
 - [Archivos `.archimate` comprimidos (zip)](#archivos-archimate-comprimidos-zip)
 - [Validación](#validación)
 - [Rendimiento](#rendimiento)
+- [Ejemplos](#ejemplos)
 - [Qué cubre](#qué-cubre)
 - [Qué queda fuera del alcance](#qué-queda-fuera-del-alcance)
 - [Requisitos y formato de módulo](#requisitos-y-formato-de-módulo)
@@ -593,6 +594,13 @@ cumplir: parsea y valida un modelo sintético de 20k elementos, 20k
 relaciones y 20k diagram objects dentro de un presupuesto de tiempo fijo, y
 verifica que el tiempo de parseo crece linealmente al duplicar el tamaño
 del modelo.
+
+## Ejemplos
+
+Recetas de consumo listas para copiar del modelo parseado — leer archivos
+`.archimate` (XML o zip), indexar y consultar, análisis de impacto sobre el
+grafo de relaciones, validación como puerta de pipeline y resolución de
+label expressions. Ver [examples/README.md](examples/README.md).
 
 ## Qué cubre
 

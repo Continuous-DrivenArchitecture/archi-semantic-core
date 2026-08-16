@@ -47,6 +47,7 @@ die ZIP-Archiv-Variante des `.archimate`-Dateiformats.
 - [Komprimierte `.archimate`-Dateien (ZIP)](#komprimierte-archimate-dateien-zip)
 - [Validierung](#validierung)
 - [Leistung](#leistung)
+- [Beispiele](#beispiele)
 - [Was abgedeckt wird](#was-abgedeckt-wird)
 - [Was außerhalb des Umfangs liegt](#was-außerhalb-des-umfangs-liegt)
 - [Anforderungen und Modulformat](#anforderungen-und-modulformat)
@@ -606,6 +607,13 @@ dies: Er parst und validiert ein synthetisches Modell mit 20.000
 Elementen, 20.000 Beziehungen und 20.000 Diagrammobjekten innerhalb eines
 festen Zeitbudgets und prüft, dass die Parse-Zeit bei doppelter
 Modellgröße linear wächst.
+
+## Beispiele
+
+Kopierfertige Konsum-Rezepte für das geparste Modell — `.archimate`-Dateien
+lesen (XML oder ZIP), Indizierung und Abfragen, Impact-Analyse über den
+Beziehungsgraphen, Validierung als Pipeline-Gate und Auflösung von Label
+Expressions. Siehe [examples/README.md](examples/README.md).
 
 ## Was abgedeckt wird
 
