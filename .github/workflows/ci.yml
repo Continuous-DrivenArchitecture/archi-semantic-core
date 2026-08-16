@@ -37,3 +37,19 @@ jobs:
       # ip-address, undici) pulled in via @semantic-release/npm, which are
       # not fixable from this repo and never reach the published package.
       - run: npm audit --omit=dev --audit-level=high
+
+  sbom:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm sbom --sbom-format=spdx --omit=dev > sbom.spdx.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sbom
+          path: sbom.spdx.json
+          if-no-files-found: error
