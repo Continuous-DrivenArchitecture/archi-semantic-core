@@ -1,6 +1,33 @@
 ## [0.3.0](https://github.com/Continuous-DrivenArchitecture/archi-semantic-core/compare/v0.2.0...v0.3.0) (2026-08-16)
 
-## [0.2.0](https://github.com/Continuous-DrivenArchitecture/archi-semantic-core/compare/v0.1.0...v0.2.0) (2026-08-16)
+### Features
+
+- **examples:** parser-focused consumption recipes for ArchiModel ([a49f82b](https://github.com/Continuous-DrivenArchitecture/archi-semantic-core/commit/a49f82b25c8d38758748a4b2739dc4bdf3d6e223))
+
+### Bug Fixes
+
+- badge paths in runbooks resolve relative to runbooks/ ([d80e59a](https://github.com/Continuous-DrivenArchitecture/archi-semantic-core/commit/d80e59a8146bf5f134e36564365084ce08eb4907))
+
+### Documentation
+
+- add new-repo playbook as internal devsecops recipe (.docs/) ([86111a6](https://github.com/Continuous-DrivenArchitecture/archi-semantic-core/commit/86111a67616275b30099eb76085d311310970024))
+- add Spanish version of the devsecops recipe ([5efc302](https://github.com/Continuous-DrivenArchitecture/archi-semantic-core/commit/5efc3021daacfffe2749c81f876b324ff0bf63ea))
+- adopt kebab-case runbook naming and add index ([f9c8887](https://github.com/Continuous-DrivenArchitecture/archi-semantic-core/commit/f9c8887a4c8ce40fe78741a4f9dace9a1cc63c6f))
+- move devsecops recipes to .github/ ([971a3e5](https://github.com/Continuous-DrivenArchitecture/archi-semantic-core/commit/971a3e5618f277e4ba3a45870664d7e38f7c856d))
+- move recipes to runbooks/ (industry standard for operational procedures) ([5bc6526](https://github.com/Continuous-DrivenArchitecture/archi-semantic-core/commit/5bc6526a63fe6c882db24da4b7644ff3f0534da5))
+- reference runbooks from CONTRIBUTING, drop runbooks index ([aec66f8](https://github.com/Continuous-DrivenArchitecture/archi-semantic-core/commit/aec66f852a73686ed821f0a2ab9912e0ec6023e4))
+- translate devsecops recipe to English ([f40d62d](https://github.com/Continuous-DrivenArchitecture/archi-semantic-core/commit/f40d62dfb110c7745fc39ab62b65c04f30910be4))
+- use the standard flag language-switcher in recipes ([cbd4db9](https://github.com/Continuous-DrivenArchitecture/archi-semantic-core/commit/cbd4db967068efd4b724004bec1a87f5af16f49a))
+- verb-first runbook naming (create-new-repo) ([ba9bee1](https://github.com/Continuous-DrivenArchitecture/archi-semantic-core/commit/ba9bee1936d9c9a3074acdee67cee8ced9d59aab))
+
+### Miscellaneous Chores
+
+- **assets:** move badges and flags from docs/ to .github/assets/ ([06280dc](https://github.com/Continuous-DrivenArchitecture/archi-semantic-core/commit/06280dc11cfa501822fdfcbb2178d0129e361f8f))
+
+### Continuous Integration
+
+- **release:** push through the sentinel app so the main ruleset allows it ([7b252bb](https://github.com/Continuous-DrivenArchitecture/archi-semantic-core/commit/7b252bb9856f53922bf90b8b0316add5e1b301b5))
+- run CI on every branch push and document develop/main flow ([e2a6350](https://github.com/Continuous-DrivenArchitecture/archi-semantic-core/commit/e2a6350c48dcf40a74745c968d23f7a1b460d4ce))
 
 ## [0.2.0](https://github.com/Continuous-DrivenArchitecture/archi-semantic-core/compare/v0.1.0...v0.2.0) (2026-08-16)
 
