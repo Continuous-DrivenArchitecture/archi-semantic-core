@@ -133,7 +133,9 @@ files — follow the existing pattern rather than re-deriving it):
 - Keep the language-switcher line (local badge per language, pointing at
   `docs/badges/lang-<code>.svg`) identical, byte-for-byte, across all seven
   files. Run `npm run badges` after bumping the version in `package.json`
-  so `docs/badges/version.svg` stays in sync.
+  so `docs/badges/version.svg` stays in sync — the script also bumps the
+  `?v=<version>` cache-busting key on the version badge link in all seven
+  READMEs (browsers otherwise serve the stale SVG after a release).
 
 CONTRIBUTING.md itself is English-only, matching the convention used across
 the other Continuous-DrivenArchitecture repos.

@@ -53,6 +53,27 @@ async function readFlag(flag) {
 await writeBadge('version.svg', { label: 'npm', message: `v${pkg.version}` });
 await writeBadge('license.svg', { label: 'license', message: pkg.license });
 
+// Cache-busting: the READMEs link the static version.svg with a ?v=<version>
+// query key, so browsers (and GitHub's render cache) treat each release's
+// badge as a fresh URL instead of serving the stale one.
+const VERSION_BADGE_PATTERN = /\.\/docs\/badges\/version\.svg(?:\?v=[^)\s"]*)?/g;
+const VERSION_BADGE_LINK = `./docs/badges/version.svg?v=${pkg.version}`;
+
+for (const language of languages) {
+  const readmePath = join(root, language.readme);
+  try {
+    const content = await readFile(readmePath, 'utf8');
+    const updated = content.replace(VERSION_BADGE_PATTERN, VERSION_BADGE_LINK);
+    if (updated !== content) {
+      await writeFile(readmePath, updated, 'utf8');
+      console.log(`generate-badges: bumped version badge cache key in ${language.readme}`);
+    }
+  } catch (err) {
+    console.error(`generate-badges: could not update ${language.readme}: ${err.message}`);
+    process.exit(1);
+  }
+}
+
 for (const language of languages) {
   const flagSvg = await readFlag(language.flag);
   const logoBase64 = `data:image/svg+xml;base64,${Buffer.from(flagSvg).toString('base64')}`;

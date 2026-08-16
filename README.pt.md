@@ -1,6 +1,6 @@
 # archi-semantic-core
 
-[![npm version](./docs/badges/version.svg)](https://www.npmjs.com/package/@cda/archi-semantic-core) [![License](./docs/badges/license.svg)](./LICENSE)
+[![npm version](./docs/badges/version.svg?v=0.2.0)](https://www.npmjs.com/package/@cda/archi-semantic-core) [![License](./docs/badges/license.svg)](./LICENSE)
 
 [![English](./docs/badges/lang-en.svg)](README.md) [![Deutsch](./docs/badges/lang-de.svg)](README.de.md) [![Español](./docs/badges/lang-es.svg)](README.es.md) [![Français](./docs/badges/lang-fr.svg)](README.fr.md) [![Nederlands](./docs/badges/lang-nl.svg)](README.nl.md) [![Português](./docs/badges/lang-pt-active.svg)](README.pt.md) [![中文](./docs/badges/lang-zh.svg)](README.zh.md)
 
