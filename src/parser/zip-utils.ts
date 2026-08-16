@@ -11,6 +11,27 @@ const MODEL_ENTRY_NAME = 'model.xml';
 const STORED = 0;
 const DEFLATE = 8;
 
+/** Precomputed CRC-32 (IEEE 802.3) lookup table — implementation kept local so no Node version-specific `zlib.crc32` availability is assumed. */
+const CRC32_TABLE = (() => {
+  const table = new Uint32Array(256);
+  for (let n = 0; n < 256; n += 1) {
+    let value = n;
+    for (let bit = 0; bit < 8; bit += 1) {
+      value = value & 1 ? 0xedb88320 ^ (value >>> 1) : value >>> 1;
+    }
+    table[n] = value >>> 0;
+  }
+  return table;
+})();
+
+function crc32(data: Buffer): number {
+  let crc = 0xffffffff;
+  for (let i = 0; i < data.length; i += 1) {
+    crc = CRC32_TABLE[(crc ^ data[i]) & 0xff] ^ (crc >>> 8);
+  }
+  return (crc ^ 0xffffffff) >>> 0;
+}
+
 /**
  * Reads a `.archimate` file's raw bytes and returns the model XML text,
  * whether the file is plain XML or the zip-archive variant Archi's own
@@ -31,7 +52,8 @@ const DEFLATE = 8;
  *
  * Throws if the input looks like a zip but has no `model.xml` entry, uses
  * a compression method other than Stored/Deflate (Archi never writes
- * anything else), or is a truncated/corrupt zip.
+ * anything else), fails its CRC-32 integrity check, or is a
+ * truncated/corrupt zip.
  */
 export function extractArchiModelXml(bytes: Uint8Array): string {
   if (!looksLikeZip(bytes)) {
@@ -46,6 +68,9 @@ export function extractArchiModelXml(bytes: Uint8Array): string {
   }
 
   const data = readEntryData(buffer, entry);
+  if (crc32(data) !== entry.crc32) {
+    throw new Error('archimate-zip-crc-mismatch: model.xml failed its CRC-32 integrity check');
+  }
   return decodeUtf8(data);
 }
 
@@ -85,6 +110,7 @@ function readEndOfCentralDirectory(buffer: Buffer): CentralDirectoryLocation {
 interface ZipEntry {
   compressionMethod: number;
   compressedSize: number;
+  crc32: number;
   localHeaderOffset: number;
 }
 
@@ -105,7 +131,7 @@ function findEntry(buffer: Buffer, location: CentralDirectoryLocation, name: str
     const fileName = buffer.toString('utf8', offset + 46, offset + 46 + fileNameLength);
 
     if (fileName === name) {
-      return { compressionMethod, compressedSize, localHeaderOffset };
+      return { compressionMethod, compressedSize, crc32: buffer.readUInt32LE(offset + 16), localHeaderOffset };
     }
 
     offset += 46 + fileNameLength + extraFieldLength + fileCommentLength;
