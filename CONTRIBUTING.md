@@ -74,6 +74,17 @@ introducing a new style:
 - **No speculative abstractions, no unrequested error handling.** Match the
   scope of the actual native attribute being added — see
   ["What this package is for"](README.md#what-this-package-is-for).
+- **Never scan a model-wide collection inside a per-item loop.** Code that
+  runs once per element/relationship/diagram object (e.g.
+  `resolveLabelExpression`, the validator, id derivation) must not do
+  `Array.find()`, `Array.filter()`, `indexOf`, or `includes` over
+  `model.elements`/`model.relationships`/view children — that is O(n²) on
+  real models. Build a `Map` index once (see the `getModelIndexes` pattern
+  in `src/parser/label-expression.ts`) and look up by id, keeping every
+  per-node path O(1). `test/performance.test.ts` enforces this with a
+  large-model time budget and a scaling-ratio check — if your change makes
+  the parser or validator noticeably slower on big models, it will fail
+  there.
 
 ## Adding a new native attribute
 

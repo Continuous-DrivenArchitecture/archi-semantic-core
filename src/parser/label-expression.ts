@@ -1,9 +1,35 @@
 import type { ArchiModel } from '../domain/model.js';
+import type { ArchiElement } from '../domain/element.js';
+import type { ArchiRelationship } from '../domain/relationship.js';
 import type { ArchiDiagramObject, ArchiDiagramConnection, ArchiNote } from '../domain/diagram.js';
 import type { ArchiFeature } from '../domain/feature.js';
 import type { ArchiProperty } from '../domain/property.js';
 
 const LABEL_EXPRESSION_FEATURE_NAME = 'labelExpression';
+
+/**
+ * Id → entity indexes over the model's semantic collections, built once per
+ * {@link ArchiModel} and cached (WeakMap) so repeated per-node resolution
+ * stays O(1) per lookup instead of O(n) `Array.find()` scans per node.
+ */
+interface ModelIndexes {
+  elementsById: Map<string, ArchiElement>;
+  relationshipsById: Map<string, ArchiRelationship>;
+}
+
+const modelIndexes = new WeakMap<ArchiModel, ModelIndexes>();
+
+function getModelIndexes(model: ArchiModel): ModelIndexes {
+  let indexes = modelIndexes.get(model);
+  if (!indexes) {
+    indexes = {
+      elementsById: new Map(model.elements.map((entry) => [entry.id, entry])),
+      relationshipsById: new Map(model.relationships.map((entry) => [entry.id, entry])),
+    };
+    modelIndexes.set(model, indexes);
+  }
+  return indexes;
+}
 
 /**
  * Returns the raw Label Expression string (Archi's own `${...}` template
@@ -54,7 +80,8 @@ function buildContext(model: ArchiModel, node: ArchiDiagramObject | ArchiDiagram
     if (node.archimateRelationshipId === null) {
       return { ...EMPTY_CONTEXT, type: stripNamespacePrefix(node.xsiType) };
     }
-    const relationship = model.relationships.find((entry) => entry.id === node.archimateRelationshipId);
+    const indexes = getModelIndexes(model);
+    const relationship = indexes.relationshipsById.get(node.archimateRelationshipId);
     if (!relationship) {
       return { ...EMPTY_CONTEXT, type: stripNamespacePrefix(node.xsiType) };
     }
@@ -76,7 +103,7 @@ function buildContext(model: ArchiModel, node: ArchiDiagramObject | ArchiDiagram
   if (node.archimateElementId === null) {
     return { ...EMPTY_CONTEXT, name: node.name, type: stripNamespacePrefix(node.xsiType) };
   }
-  const element = model.elements.find((entry) => entry.id === node.archimateElementId);
+  const element = getModelIndexes(model).elementsById.get(node.archimateElementId);
   if (!element) {
     return { ...EMPTY_CONTEXT, name: node.name, type: stripNamespacePrefix(node.xsiType) };
   }
