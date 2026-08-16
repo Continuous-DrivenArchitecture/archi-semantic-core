@@ -141,6 +141,21 @@ files — follow the existing pattern rather than re-deriving it):
 CONTRIBUTING.md itself is English-only, matching the convention used across
 the other Continuous-DrivenArchitecture repos.
 
+## Branching strategy
+
+- **`main`** is the release branch: semantic-release publishes from it
+  (`.releaserc.json` -> `branches: ["main"]`) and it is protected by the
+  GitHub ruleset — nothing reaches it without a reviewed PR, except the
+  release workflow's own `chore(release)` push (bypassed for GitHub
+  Actions).
+- **`develop`** is the integration branch: commit freely, push freely,
+  CI runs on every push. When the work is ready to ship, open a PR
+  `develop -> main` and let the ruleset + CI decide.
+- Nothing is ever published to npm from `develop`; only `main` releases.
+- After each release on `main`, sync `develop` so it keeps the
+  `chore(release)` commits and the regenerated badges:
+  `git checkout develop && git merge main && git push origin develop`.
+
 ## Commits and pull requests
 
 - Use [Conventional Commits](https://www.conventionalcommits.org/) prefixes
