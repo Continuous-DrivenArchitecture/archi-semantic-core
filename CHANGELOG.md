@@ -1,3 +1,20 @@
+## [0.3.1](https://github.com/Continuous-DrivenArchitecture/archi-semantic-core/compare/v0.3.0...v0.3.1) (2026-08-16)
+
+### Bug Fixes
+
+* **release:** generate real release notes with conventionalcommits v9 ([869b205](https://github.com/Continuous-DrivenArchitecture/archi-semantic-core/commit/869b20569a38631b63515dd5e21a6fc07bad13e4))
+
+### Miscellaneous Chores
+
+* **deps:** bump actions/upload-artifact from 4.6.2 to 7.0.1 ([602ab49](https://github.com/Continuous-DrivenArchitecture/archi-semantic-core/commit/602ab49f4522d13403cd5c119cf387ec7ec0812f))
+* **deps:** bump actions/upload-artifact from 4.6.2 to 7.0.1 ([#8](https://github.com/Continuous-DrivenArchitecture/archi-semantic-core/issues/8)) ([ed9ba78](https://github.com/Continuous-DrivenArchitecture/archi-semantic-core/commit/ed9ba7850861b67755877aa482494742a18e09af))
+
+### Continuous Integration
+
+* **dependabot:** open pull requests against develop, not main ([02719b4](https://github.com/Continuous-DrivenArchitecture/archi-semantic-core/commit/02719b445a975c213e28d67e78c1e6817a9c624d))
+* **release:** drop NPM_TOKEN, publish via OIDC only ([22afbd6](https://github.com/Continuous-DrivenArchitecture/archi-semantic-core/commit/22afbd69dc29e63ceed311fae92997a3a6b8aebe))
+* **release:** guard against non-human release commit authors ([53a149e](https://github.com/Continuous-DrivenArchitecture/archi-semantic-core/commit/53a149ebc47a726193c706781730ed23ee3eb581))
+
 ## [0.3.0](https://github.com/Continuous-DrivenArchitecture/archi-semantic-core/compare/v0.2.0...v0.3.0) (2026-08-16)
 
 ### Features
