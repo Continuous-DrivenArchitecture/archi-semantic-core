@@ -47,7 +47,7 @@
     "@semantic-release/exec": "^7.1.0",
     "@semantic-release/git": "^11.0.1",
     "@semantic-release/github": "^12.0.9",
-    "@types/node": "^24.0.0",
+    "@types/node": "^26.2.0",
     "badge-maker": "^6.0.0",
     "conventional-changelog-conventionalcommits": "^10.3.0",
     "semantic-release": "^25.0.9",
