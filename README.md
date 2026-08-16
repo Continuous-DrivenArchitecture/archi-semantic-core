@@ -1,8 +1,8 @@
 # archi-semantic-core
 
-[![npm version](./docs/badges/version.svg?v=0.2.0)](https://www.npmjs.com/package/@cda/archi-semantic-core) [![License](./docs/badges/license.svg)](./LICENSE)
+[![npm version](./.github/assets/badges/version.svg?v=0.2.0)](https://www.npmjs.com/package/@cda/archi-semantic-core) [![License](./.github/assets/badges/license.svg)](./LICENSE)
 
-[![English](./docs/badges/lang-en-active.svg)](README.md) [![Deutsch](./docs/badges/lang-de.svg)](README.de.md) [![Español](./docs/badges/lang-es.svg)](README.es.md) [![Français](./docs/badges/lang-fr.svg)](README.fr.md) [![Nederlands](./docs/badges/lang-nl.svg)](README.nl.md) [![Português](./docs/badges/lang-pt.svg)](README.pt.md) [![中文](./docs/badges/lang-zh.svg)](README.zh.md)
+[![English](./.github/assets/badges/lang-en-active.svg)](README.md) [![Deutsch](./.github/assets/badges/lang-de.svg)](README.de.md) [![Español](./.github/assets/badges/lang-es.svg)](README.es.md) [![Français](./.github/assets/badges/lang-fr.svg)](README.fr.md) [![Nederlands](./.github/assets/badges/lang-nl.svg)](README.nl.md) [![Português](./.github/assets/badges/lang-pt.svg)](README.pt.md) [![中文](./.github/assets/badges/lang-zh.svg)](README.zh.md)
 
 A TypeScript parser for native `.archimate` model files created by the
 [Archi](https://www.archimatetool.com/) desktop editor.
@@ -46,6 +46,7 @@ reads the zip-archive variant of the `.archimate` file format.
 - [Zip-archive `.archimate` files](#zip-archive-archimate-files)
 - [Validation](#validation)
 - [Performance](#performance)
+- [Examples](#examples)
 - [What's covered](#whats-covered)
 - [What's out of scope](#whats-out-of-scope)
 - [Requirements and module format](#requirements-and-module-format)
@@ -572,6 +573,13 @@ A performance regression test (`test/performance.test.ts`) enforces this:
 it parses and validates a synthetic model of 20k elements, 20k
 relationships, and 20k diagram objects within a fixed time budget, and
 checks that parse time grows linearly when the model size doubles.
+
+## Examples
+
+Ready-to-copy consumption recipes for the parsed model — reading
+`.archimate` files (XML or zip), indexing and querying, impact analysis
+over the relationship graph, validation as a pipeline gate, and label
+expression resolution. See [examples/README.md](examples/README.md).
 
 ## What's covered
 

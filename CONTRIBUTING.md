@@ -131,14 +131,30 @@ files — follow the existing pattern rather than re-deriving it):
   algorithm for the translated headings — don't just copy the English
   anchors.
 - Keep the language-switcher line (local badge per language, pointing at
-  `docs/badges/lang-<code>.svg`) identical, byte-for-byte, across all seven
-  files. Run `npm run badges` after bumping the version in `package.json`
-  so `docs/badges/version.svg` stays in sync — the script also bumps the
-  `?v=<version>` cache-busting key on the version badge link in all seven
-  READMEs (browsers otherwise serve the stale SVG after a release).
+  `.github/assets/badges/lang-<code>.svg`) identical, byte-for-byte, across
+  all seven files. Run `npm run badges` after bumping the version in
+  `package.json` so `.github/assets/badges/version.svg` stays in sync — the
+  script also bumps the `?v=<version>` cache-busting key on the version
+  badge link in all seven READMEs (browsers otherwise serve the stale SVG
+  after a release).
 
 CONTRIBUTING.md itself is English-only, matching the convention used across
 the other Continuous-DrivenArchitecture repos.
+
+## Branching strategy
+
+- **`main`** is the release branch: semantic-release publishes from it
+  (`.releaserc.json` -> `branches: ["main"]`) and it is protected by the
+  GitHub ruleset — nothing reaches it without a reviewed PR, except the
+  release workflow's own `chore(release)` push (bypassed for the
+  `cda-release-sentinel` app).
+- **`develop`** is the integration branch: commit freely, push freely,
+  CI runs on every push. When the work is ready to ship, open a PR
+  `develop -> main` and let the ruleset + CI decide.
+- Nothing is ever published to npm from `develop`; only `main` releases.
+- After each release on `main`, sync `develop` so it keeps the
+  `chore(release)` commits and the regenerated badges:
+  `git checkout develop && git merge main && git push origin develop`.
 
 ## Commits and pull requests
 
@@ -155,6 +171,19 @@ the other Continuous-DrivenArchitecture repos.
 - Don't bump the version in `package.json` or edit `CHANGELOG.md` — both
   are handled automatically at release time by semantic-release
   (`.releaserc.json`); every release is a tag-triggered push to `main`.
+
+## Runbooks
+
+Operational procedures for maintaining this repository (and its siblings)
+live in [`runbooks/`](runbooks/), one file per procedure, named after the
+action it performs (imperative, kebab-case):
+
+| Runbook | Description |
+|---|---|
+| [`create-new-repo.md`](runbooks/create-new-repo.md) / [`create-new-repo.es.md`](runbooks/create-new-repo.es.md) | Stand up a new library repository end-to-end: sentinel GitHub App, main ruleset, OIDC publishing, pinned actions, first release verification |
+
+Add a new runbook to `runbooks/` (with its `.es.md` translation when
+relevant) and to this table when one lands.
 
 ## License
 

@@ -1,8 +1,8 @@
 # archi-semantic-core
 
-[![npm version](./docs/badges/version.svg?v=0.2.0)](https://www.npmjs.com/package/@cda/archi-semantic-core) [![License](./docs/badges/license.svg)](./LICENSE)
+[![npm version](./.github/assets/badges/version.svg?v=0.2.0)](https://www.npmjs.com/package/@cda/archi-semantic-core) [![License](./.github/assets/badges/license.svg)](./LICENSE)
 
-[![English](./docs/badges/lang-en.svg)](README.md) [![Deutsch](./docs/badges/lang-de.svg)](README.de.md) [![Español](./docs/badges/lang-es-active.svg)](README.es.md) [![Français](./docs/badges/lang-fr.svg)](README.fr.md) [![Nederlands](./docs/badges/lang-nl.svg)](README.nl.md) [![Português](./docs/badges/lang-pt.svg)](README.pt.md) [![中文](./docs/badges/lang-zh.svg)](README.zh.md)
+[![English](./.github/assets/badges/lang-en.svg)](README.md) [![Deutsch](./.github/assets/badges/lang-de.svg)](README.de.md) [![Español](./.github/assets/badges/lang-es-active.svg)](README.es.md) [![Français](./.github/assets/badges/lang-fr.svg)](README.fr.md) [![Nederlands](./.github/assets/badges/lang-nl.svg)](README.nl.md) [![Português](./.github/assets/badges/lang-pt.svg)](README.pt.md) [![中文](./.github/assets/badges/lang-zh.svg)](README.zh.md)
 
 
 Un parser de TypeScript para archivos de modelo `.archimate` nativos creados
@@ -47,6 +47,7 @@ de Archi. También lee la variante comprimida (zip) del formato `.archimate`.
 - [Archivos `.archimate` comprimidos (zip)](#archivos-archimate-comprimidos-zip)
 - [Validación](#validación)
 - [Rendimiento](#rendimiento)
+- [Ejemplos](#ejemplos)
 - [Qué cubre](#qué-cubre)
 - [Qué queda fuera del alcance](#qué-queda-fuera-del-alcance)
 - [Requisitos y formato de módulo](#requisitos-y-formato-de-módulo)
@@ -593,6 +594,13 @@ cumplir: parsea y valida un modelo sintético de 20k elementos, 20k
 relaciones y 20k diagram objects dentro de un presupuesto de tiempo fijo, y
 verifica que el tiempo de parseo crece linealmente al duplicar el tamaño
 del modelo.
+
+## Ejemplos
+
+Recetas de consumo listas para copiar del modelo parseado — leer archivos
+`.archimate` (XML o zip), indexar y consultar, análisis de impacto sobre el
+grafo de relaciones, validación como puerta de pipeline y resolución de
+label expressions. Ver [examples/README.md](examples/README.md).
 
 ## Qué cubre
 

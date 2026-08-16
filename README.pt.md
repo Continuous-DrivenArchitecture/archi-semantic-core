@@ -1,8 +1,8 @@
 # archi-semantic-core
 
-[![npm version](./docs/badges/version.svg?v=0.2.0)](https://www.npmjs.com/package/@cda/archi-semantic-core) [![License](./docs/badges/license.svg)](./LICENSE)
+[![npm version](./.github/assets/badges/version.svg?v=0.2.0)](https://www.npmjs.com/package/@cda/archi-semantic-core) [![License](./.github/assets/badges/license.svg)](./LICENSE)
 
-[![English](./docs/badges/lang-en.svg)](README.md) [![Deutsch](./docs/badges/lang-de.svg)](README.de.md) [![Español](./docs/badges/lang-es.svg)](README.es.md) [![Français](./docs/badges/lang-fr.svg)](README.fr.md) [![Nederlands](./docs/badges/lang-nl.svg)](README.nl.md) [![Português](./docs/badges/lang-pt-active.svg)](README.pt.md) [![中文](./docs/badges/lang-zh.svg)](README.zh.md)
+[![English](./.github/assets/badges/lang-en.svg)](README.md) [![Deutsch](./.github/assets/badges/lang-de.svg)](README.de.md) [![Español](./.github/assets/badges/lang-es.svg)](README.es.md) [![Français](./.github/assets/badges/lang-fr.svg)](README.fr.md) [![Nederlands](./.github/assets/badges/lang-nl.svg)](README.nl.md) [![Português](./.github/assets/badges/lang-pt-active.svg)](README.pt.md) [![中文](./.github/assets/badges/lang-zh.svg)](README.zh.md)
 
 Um parser em TypeScript para arquivos de modelo `.archimate` nativos criados
 pelo editor de desktop [Archi](https://www.archimatetool.com/).
@@ -47,6 +47,7 @@ formato `.archimate`.
 - [Arquivos `.archimate` compactados (zip)](#arquivos-archimate-compactados-zip)
 - [Validação](#validação)
 - [Desempenho](#desempenho)
+- [Exemplos](#exemplos)
 - [O que é coberto](#o-que-é-coberto)
 - [O que está fora do escopo](#o-que-está-fora-do-escopo)
 - [Requisitos e formato de módulo](#requisitos-e-formato-de-módulo)
@@ -598,6 +599,13 @@ isso: ele faz parse e validação de um modelo sintético com 20.000
 elementos, 20.000 relacionamentos e 20.000 diagram objects dentro de um
 orçamento de tempo fixo, e verifica que o tempo de parsing cresce
 linearmente quando o tamanho do modelo dobra.
+
+## Exemplos
+
+Receitas de consumo prontas para copiar do modelo analisado — leitura de
+arquivos `.archimate` (XML ou zip), indexação e consultas, análise de
+impacto sobre o grafo de relacionamentos, validação como porta de pipeline
+e resolução de label expressions. Ver [examples/README.md](examples/README.md).
 
 ## O que é coberto
 
