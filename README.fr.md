@@ -46,6 +46,7 @@ du format de fichier `.archimate`.
 - [Specializations et Profiles](#specializations-et-profiles)
 - [Fichiers `.archimate` compressés (zip)](#fichiers-archimate-compressés-zip)
 - [Validation](#validation)
+- [Performances](#performances)
 - [Ce qui est couvert](#ce-qui-est-couvert)
 - [Ce qui est hors périmètre](#ce-qui-est-hors-périmètre)
 - [Prérequis et format de module](#prérequis-et-format-de-module)
@@ -170,7 +171,8 @@ Passez le résultat à `parseArchiModel`.
 
 Lève une exception si l'entrée ressemble à un zip mais ne contient pas
 d'entrée `model.xml`, utilise une méthode de compression autre que
-Stored/Deflate (Archi n'écrit jamais autre chose), ou est un zip
+Stored/Deflate (Archi n'écrit jamais autre chose), échoue à son contrôle
+d'intégrité CRC-32, ou est un zip
 tronqué/corrompu.
 
 ### `getLabelExpression(features: ArchiFeature[]): string | null`
@@ -593,6 +595,23 @@ un id unique et non vide, et que chaque référence croisée vérifiée par ce
 validateur se résout — cela ne vérifie ni l'exhaustivité d'`ArchiBounds`,
 ni les références `ArchiProfile`/`profiles`, ni rien qui concerne le style
 ou les features.
+
+## Performances
+
+L'analyse et la validation évoluent **linéairement** avec la taille du
+modèle : les ids et les références croisées sont indexés une seule fois par
+des passes `Map`/`Set` en un seul parcours, de sorte qu'aucun chemin de
+code ne re-scanne `model.elements`/`model.relationships` par élément.
+`resolveLabelExpression` est en **O(1) par nœud** — ses recherches
+d'élément/relation passent par des index `Map` mis en cache par modèle, ce
+qui rend l'évaluation des expressions de label pour tous les diagram
+objects d'un grand modèle peu coûteuse.
+
+Un test de régression de performance (`test/performance.test.ts`) fait
+respecter cette garantie : il analyse et valide un modèle synthétique de
+20 000 éléments, 20 000 relations et 20 000 diagram objects dans un budget
+de temps fixe, et vérifie que le temps d'analyse croît linéairement lorsque
+la taille du modèle double.
 
 ## Ce qui est couvert
 

@@ -45,6 +45,7 @@ kennen. Het leest ook de zip-archiefvariant van het `.archimate`-bestandsformaat
 - [Specializations en Profiles](#specializations-en-profiles)
 - [Gecomprimeerde `.archimate`-bestanden (zip)](#gecomprimeerde-archimate-bestanden-zip)
 - [Validatie](#validatie)
+- [Prestaties](#prestaties)
 - [Wat wordt ondersteund](#wat-wordt-ondersteund)
 - [Wat buiten scope valt](#wat-buiten-scope-valt)
 - [Vereisten en moduleformaat](#vereisten-en-moduleformaat)
@@ -169,7 +170,8 @@ Geef het resultaat door aan `parseArchiModel`.
 
 Gooit een exception als de invoer eruitziet als een zip maar geen
 `model.xml`-item bevat, een andere compressiemethode gebruikt dan
-Stored/Deflate (Archi schrijft nooit iets anders), of een afgekapte/corrupte
+Stored/Deflate (Archi schrijft nooit iets anders), de CRC-32-integriteitscontrole
+niet doorstaat, of een afgekapte/corrupte
 zip is.
 
 ### `getLabelExpression(features: ArchiFeature[]): string | null`
@@ -580,6 +582,22 @@ niet-lege id heeft en dat elke kruisverwijzing die deze validator controleert
 oplosbaar is — het controleert niet of `ArchiBounds` compleet is, niet de
 referenties van `ArchiProfile`/`profiles`, en niets dat met styling of
 features te maken heeft.
+
+## Prestaties
+
+Parsen en validatie schalen **lineair** met de grootte van het model: ids
+en kruisverwijzingen worden in één keer geïndexeerd in `Map`/`Set`-passes
+zonder herhaling, zodat geen codepad `model.elements`/`model.relationships`
+per item opnieuw doorzoekt. `resolveLabelExpression` is **O(1) per node** —
+de opzoekingen van element/relatie lopen via per-model gecachte
+`Map`-indexen, waardoor het oplossen van label expressions voor alle
+diagramobjects van een groot model goedkoop blijft.
+
+Een prestatietest voor regressie (`test/performance.test.ts`) dwingt dit
+af: het parst en valideert een synthetisch model van 20.000 elementen,
+20.000 relaties en 20.000 diagramobjects binnen een vast tijdsbudget, en
+controleert dat de parse-tijd lineair groeit wanneer de modelgrootte
+verdubbelt.
 
 ## Wat wordt ondersteund
 

@@ -39,6 +39,7 @@
 - [Specializations 和 Profiles](#specializations-和-profiles)
 - [Zip 归档 `.archimate` 文件](#zip-归档-archimate-文件)
 - [验证](#验证)
+- [性能](#性能)
 - [已覆盖的内容](#已覆盖的内容)
 - [不在范围内的内容](#不在范围内的内容)
 - [环境要求和模块格式](#环境要求和模块格式)
@@ -129,7 +130,7 @@ const model = parseArchiModel(xml);
 
 从 `.archimate` 文件的原始字节中返回模型的 XML 文本，无论该文件是纯 XML 还是 Archi 的压缩包（zip）变体（`model.xml` 加上每个内嵌自定义图标对应的一条 `images/` 条目，一起打包压缩——参见 [Zip 归档 `.archimate` 文件](#zip-归档-archimate-文件)）。将返回结果传给 `parseArchiModel` 即可。
 
-如果输入看起来像压缩包但没有 `model.xml` 条目、使用了 Stored/Deflate 之外的压缩方式（Archi 从不会写出其他压缩方式），或者是一个截断/损坏的压缩包，则会抛出异常。
+如果输入看起来像压缩包但没有 `model.xml` 条目、使用了 Stored/Deflate 之外的压缩方式（Archi 从不会写出其他压缩方式）、未通过 CRC-32 完整性校验，或者是一个截断/损坏的压缩包，则会抛出异常。
 
 ### `getLabelExpression(features: ArchiFeature[]): string | null`
 
@@ -423,6 +424,12 @@ const model = parseArchiModel(xml);
 每一条问题都带有一个 `path` 定位符（例如 `"relationships[rel-1].sourceId"`），指向返回的 `ArchiModel`——而不是原始 XML——因此可以直接追溯到出问题的那个字段。
 
 `{ valid: true, errors: [] }` 意味着每个带 id 的条目都拥有唯一且非空的 id，并且这个验证器所检查的每一个交叉引用都能正确解析——但它不会检查 `ArchiBounds` 是否完整、`ArchiProfile`/`profiles` 引用，也不会检查任何与样式或 feature 相关的内容。
+
+## 性能
+
+解析和验证与模型大小呈**线性**关系：id 和交叉引用在单次 `Map`/`Set` 遍历中一次性完成索引，因此没有任何代码路径会逐条重新扫描 `model.elements`/`model.relationships`。`resolveLabelExpression` 是**每个节点 O(1)**——它的元素/关系查找通过按模型缓存的 `Map` 索引进行，因此为大型模型中的所有图表对象解析 label expressions 依然成本低廉。
+
+一个性能回归测试（`test/performance.test.ts`）强制执行这一保证：它在一个固定的时间预算内解析并验证一个包含 20,000 个元素、20,000 个关系和 20,000 个图表对象的合成模型，并检查当模型规模翻倍时解析时间呈线性增长。
 
 ## 已覆盖的内容
 

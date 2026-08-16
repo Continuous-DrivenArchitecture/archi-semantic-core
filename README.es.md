@@ -46,6 +46,7 @@ de Archi. También lee la variante comprimida (zip) del formato `.archimate`.
 - [Specializations y Profiles](#specializations-y-profiles)
 - [Archivos `.archimate` comprimidos (zip)](#archivos-archimate-comprimidos-zip)
 - [Validación](#validación)
+- [Rendimiento](#rendimiento)
 - [Qué cubre](#qué-cubre)
 - [Qué queda fuera del alcance](#qué-queda-fuera-del-alcance)
 - [Requisitos y formato de módulo](#requisitos-y-formato-de-módulo)
@@ -167,7 +168,8 @@ Pasá el resultado a `parseArchiModel`.
 
 Lanza una excepción si el archivo parece un zip pero no tiene una entrada
 `model.xml`, usa un método de compresión distinto de Stored/Deflate (Archi
-nunca escribe otra cosa), o es un zip truncado/corrupto.
+nunca escribe otra cosa), falla la verificación de integridad CRC-32, o es
+un zip truncado/corrupto.
 
 ### `getLabelExpression(features: ArchiFeature[]): string | null`
 
@@ -574,6 +576,23 @@ rastrearlo directamente hasta el campo que falló.
 único y no vacío, y que toda referencia cruzada que este validator chequea
 resuelve — no verifica que `ArchiBounds` esté completo, ni las referencias de
 `ArchiProfile`/`profiles`, ni nada relacionado con estilos o features.
+
+## Rendimiento
+
+El parseo y la validación escalan **linealmente** con el tamaño del modelo:
+los ids y las referencias cruzadas se indexan una sola vez en pasadas
+`Map`/`Set` de una sola pasada, de modo que ningún camino de código
+re-escanea `model.elements`/`model.relationships` por ítem.
+`resolveLabelExpression` es **O(1) por nodo** — sus búsquedas de
+elemento/relación pasan por índices `Map` cacheados por modelo, así que
+resolver las expresiones de label de todos los diagram objects de un modelo
+grande sigue siendo barato.
+
+Un test de regresión de rendimiento (`test/performance.test.ts`) lo hace
+cumplir: parsea y valida un modelo sintético de 20k elementos, 20k
+relaciones y 20k diagram objects dentro de un presupuesto de tiempo fijo, y
+verifica que el tiempo de parseo crece linealmente al duplicar el tamaño
+del modelo.
 
 ## Qué cubre
 

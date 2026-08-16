@@ -46,6 +46,7 @@ die ZIP-Archiv-Variante des `.archimate`-Dateiformats.
 - [Specializations und Profiles](#specializations-und-profiles)
 - [Komprimierte `.archimate`-Dateien (ZIP)](#komprimierte-archimate-dateien-zip)
 - [Validierung](#validierung)
+- [Leistung](#leistung)
 - [Was abgedeckt wird](#was-abgedeckt-wird)
 - [Was außerhalb des Umfangs liegt](#was-außerhalb-des-umfangs-liegt)
 - [Anforderungen und Modulformat](#anforderungen-und-modulformat)
@@ -170,7 +171,8 @@ eingebettetem benutzerdefiniertem Icon, gemeinsam gezippt — siehe
 
 Wirft eine Exception, wenn die Eingabe wie ein ZIP aussieht, aber keinen
 `model.xml`-Eintrag enthält, eine andere Komprimierungsmethode als
-Stored/Deflate verwendet (Archi schreibt nie etwas anderes) oder ein
+Stored/Deflate verwendet (Archi schreibt nie etwas anderes), die
+CRC-32-Integritätsprüfung nicht besteht oder ein
 abgeschnittenes/beschädigtes ZIP ist.
 
 ### `getLabelExpression(features: ArchiFeature[]): string | null`
@@ -588,6 +590,22 @@ eindeutige, nicht leere ID hat und jede Querreferenz, die dieser Validator
 prüft, aufgelöst werden kann — er prüft weder die Vollständigkeit von
 `ArchiBounds` noch `ArchiProfile`/`profiles`-Referenzen noch irgendetwas mit
 Bezug zu Style oder Features.
+
+## Leistung
+
+Parsen und Validierung skalieren **linear** mit der Modellgröße: IDs und
+Querreferenzen werden einmalig in einzelnen `Map`/`Set`-Durchläufen
+indiziert, sodass kein Codepfad `model.elements`/`model.relationships` pro
+Eintrag erneut durchsucht. `resolveLabelExpression` ist **O(1) pro Knoten**
+— seine Element-/Beziehungs-Lookups laufen über pro Modell gecachte
+`Map`-Indizes, wodurch das Auflösen von Label Expressions für alle
+Diagrammobjekte eines großen Modells günstig bleibt.
+
+Ein Performance-Regressionstest (`test/performance.test.ts`) erzwingt
+dies: Er parst und validiert ein synthetisches Modell mit 20.000
+Elementen, 20.000 Beziehungen und 20.000 Diagrammobjekten innerhalb eines
+festen Zeitbudgets und prüft, dass die Parse-Zeit bei doppelter
+Modellgröße linear wächst.
 
 ## Was abgedeckt wird
 

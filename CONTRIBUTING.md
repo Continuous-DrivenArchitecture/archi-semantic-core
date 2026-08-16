@@ -105,7 +105,9 @@ every existing field was added:
    `toMatchObject` for style/geometry objects, so a future field addition
    can't silently go unasserted.
 6. Update `README.md` **and every translation** (see below).
-7. Add an entry under `## [Unreleased]` in `CHANGELOG.md`.
+7. There is **no manual changelog step** — `CHANGELOG.md` is generated
+   automatically from commit messages at release time (see
+   `.releaserc.json`), so write commits that read well as release notes.
 
 ## Translations
 
@@ -144,8 +146,9 @@ the other Continuous-DrivenArchitecture repos.
 - Keep `npm run typecheck` and `npm test` passing before opening a PR.
 - Describe *why* the change is needed, not just what changed — especially
   for a new native attribute, cite what you checked in Archi's source.
-- Don't bump the version in `package.json` or move a `CHANGELOG.md` entry
-  out of `[Unreleased]` — that's done at release time.
+- Don't bump the version in `package.json` or edit `CHANGELOG.md` — both
+  are handled automatically at release time by semantic-release
+  (`.releaserc.json`); every release is a tag-triggered push to `main`.
 
 ## License
 

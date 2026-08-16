@@ -46,6 +46,7 @@ formato `.archimate`.
 - [Specializations e Profiles](#specializations-e-profiles)
 - [Arquivos `.archimate` compactados (zip)](#arquivos-archimate-compactados-zip)
 - [Validação](#validação)
+- [Desempenho](#desempenho)
 - [O que é coberto](#o-que-é-coberto)
 - [O que está fora do escopo](#o-que-está-fora-do-escopo)
 - [Requisitos e formato de módulo](#requisitos-e-formato-de-módulo)
@@ -167,7 +168,8 @@ Passe o resultado para `parseArchiModel`.
 
 Lança uma exceção se a entrada parece um zip mas não tem uma entrada
 `model.xml`, usa um método de compactação diferente de Stored/Deflate (o
-Archi nunca grava outra coisa), ou é um zip truncado/corrompido.
+Archi nunca grava outra coisa), falha na verificação de integridade CRC-32,
+ou é um zip truncado/corrompido.
 
 ### `getLabelExpression(features: ArchiFeature[]): string | null`
 
@@ -579,6 +581,23 @@ campo que falhou.
 validador se resolve corretamente — ele não verifica a completude de
 `ArchiBounds`, as referências de `ArchiProfile`/`profiles`, nem nada
 relacionado a estilo ou features.
+
+## Desempenho
+
+O parsing e a validação escalam **linearmente** com o tamanho do modelo:
+os ids e as referências cruzadas são indexados uma única vez em passadas
+`Map`/`Set` de um só percurso, de modo que nenhum caminho de código
+re-escaneia `model.elements`/`model.relationships` por item.
+`resolveLabelExpression` é **O(1) por nó** — suas buscas de
+elemento/relacionamento passam por índices `Map` em cache por modelo, então
+resolver as expressões de label de todos os diagram objects de um modelo
+grande continua barato.
+
+Um teste de regressão de desempenho (`test/performance.test.ts`) garante
+isso: ele faz parse e validação de um modelo sintético com 20.000
+elementos, 20.000 relacionamentos e 20.000 diagram objects dentro de um
+orçamento de tempo fixo, e verifica que o tempo de parsing cresce
+linearmente quando o tamanho do modelo dobra.
 
 ## O que é coberto
 

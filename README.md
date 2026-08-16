@@ -45,6 +45,7 @@ reads the zip-archive variant of the `.archimate` file format.
 - [Specializations and Profiles](#specializations-and-profiles)
 - [Zip-archive `.archimate` files](#zip-archive-archimate-files)
 - [Validation](#validation)
+- [Performance](#performance)
 - [What's covered](#whats-covered)
 - [What's out of scope](#whats-out-of-scope)
 - [Requirements and module format](#requirements-and-module-format)
@@ -160,7 +161,7 @@ result to `parseArchiModel`.
 
 Throws if the input looks like a zip but has no `model.xml` entry, uses a
 compression method other than Stored/Deflate (Archi never writes anything
-else), or is a truncated/corrupt zip.
+else), fails its CRC-32 integrity check, or is a truncated/corrupt zip.
 
 ### `getLabelExpression(features: ArchiFeature[]): string | null`
 
@@ -557,6 +558,20 @@ straight back to the field that failed.
 non-empty id and every cross-reference this validator checks resolves — it
 does not check `ArchiBounds` completeness, `ArchiProfile`/`profiles`
 references, or anything style/feature-related.
+
+## Performance
+
+Parsing and validation scale **linearly** with model size: ids and
+cross-references are indexed once in single-pass `Map`/`Set` passes, so no
+code path re-scans `model.elements`/`model.relationships` per item.
+`resolveLabelExpression` is **O(1) per node** — its element/relationship
+lookups go through per-model cached `Map` indexes, so resolving label
+expressions for every diagram object in a large model stays cheap.
+
+A performance regression test (`test/performance.test.ts`) enforces this:
+it parses and validates a synthetic model of 20k elements, 20k
+relationships, and 20k diagram objects within a fixed time budget, and
+checks that parse time grows linearly when the model size doubles.
 
 ## What's covered
 
