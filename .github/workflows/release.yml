@@ -37,10 +37,21 @@ jobs:
       - run: npx semantic-release
         env:
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           # Attribute the chore(release) commit to a human maintainer
           # instead of the default @semantic-release-bot identity.
           GIT_AUTHOR_NAME: Miguel Cespedes
           GIT_AUTHOR_EMAIL: miguelcespedes@outlook.com
           GIT_COMMITTER_NAME: Miguel Cespedes
           GIT_COMMITTER_EMAIL: miguelcespedes@outlook.com
+      # Guard: the release commit must be authored by the human
+      # maintainer, never by a bot identity. If the identity env vars
+      # above are ever removed or overridden, this fails the workflow
+      # instead of silently polluting the contributor graph again.
+      - name: Verify release commit author
+        run: |
+          author="$(git log -1 --format=%an <%ae>)"
+          expected="Miguel Cespedes <miguelcespedes@outlook.com>"
+          if [ "$author" != "$expected" ]; then
+            echo "::error::release commit authored by '$author', expected '$expected'" >&2
+            exit 1
+          fi
