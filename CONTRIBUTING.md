@@ -146,6 +146,10 @@ the other Continuous-DrivenArchitecture repos.
   (`feat:`, `fix:`, `docs:`, `chore:`, ...), matching this repo's existing
   history.
 - Keep `npm run typecheck` and `npm test` passing before opening a PR.
+- Pin every third-party GitHub Action to its **full commit SHA** (never a
+  floating tag) — a moved tag is a supply-chain vector with the
+  workflow's token. Resolve the SHA from the action's release, then use
+  `actions/foo@<40-char-sha>`.
 - Describe *why* the change is needed, not just what changed — especially
   for a new native attribute, cite what you checked in Archi's source.
 - Don't bump the version in `package.json` or edit `CHANGELOG.md` — both
