@@ -4,7 +4,8 @@ End-to-end checklist for standing up a `Continuous-DrivenArchitecture`
 repository with automated releases, identity governance, and a protected
 `main` branch. ~45 minutes once per repo. This recipe was first applied
 to `archi-semantic-core` (see its history for real-world examples).
-Spanish version: [`NEW-REPO.es.md`](NEW-REPO.es.md).
+
+[![English](./.github/assets/badges/lang-en-active.svg)](NEW-REPO.md) [![Español](./.github/assets/badges/lang-es.svg)](NEW-REPO.es.md)
 
 ---
 
