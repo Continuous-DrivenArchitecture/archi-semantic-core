@@ -6,7 +6,7 @@ they perform (kebab-case, imperative where it reads naturally).
 
 | Runbook | Description |
 |---|---|
-| [`new-repo.md`](new-repo.md) / [`new-repo.es.md`](new-repo.es.md) | Stand up a new library repository end-to-end: sentinel GitHub App, main ruleset, OIDC publishing, pinned actions, first release verification |
+| [`create-new-repo.md`](create-new-repo.md) / [`create-new-repo.es.md`](create-new-repo.es.md) | Stand up a new library repository end-to-end: sentinel GitHub App, main ruleset, OIDC publishing, pinned actions, first release verification |
 
 ## Conventions
 
