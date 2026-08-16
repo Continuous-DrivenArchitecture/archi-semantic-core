@@ -1,8 +1,8 @@
 # archi-semantic-core
 
-[![npm version](./docs/badges/version.svg?v=0.2.0)](https://www.npmjs.com/package/@cda/archi-semantic-core) [![License](./docs/badges/license.svg)](./LICENSE)
+[![npm version](./.github/assets/badges/version.svg?v=0.2.0)](https://www.npmjs.com/package/@cda/archi-semantic-core) [![License](./.github/assets/badges/license.svg)](./LICENSE)
 
-[![English](./docs/badges/lang-en.svg)](README.md) [![Deutsch](./docs/badges/lang-de.svg)](README.de.md) [![Español](./docs/badges/lang-es.svg)](README.es.md) [![Français](./docs/badges/lang-fr-active.svg)](README.fr.md) [![Nederlands](./docs/badges/lang-nl.svg)](README.nl.md) [![Português](./docs/badges/lang-pt.svg)](README.pt.md) [![中文](./docs/badges/lang-zh.svg)](README.zh.md)
+[![English](./.github/assets/badges/lang-en.svg)](README.md) [![Deutsch](./.github/assets/badges/lang-de.svg)](README.de.md) [![Español](./.github/assets/badges/lang-es.svg)](README.es.md) [![Français](./.github/assets/badges/lang-fr-active.svg)](README.fr.md) [![Nederlands](./.github/assets/badges/lang-nl.svg)](README.nl.md) [![Português](./.github/assets/badges/lang-pt.svg)](README.pt.md) [![中文](./.github/assets/badges/lang-zh.svg)](README.zh.md)
 
 Un parseur TypeScript pour les fichiers de modèle `.archimate` natifs créés
 par l'éditeur de bureau [Archi](https://www.archimatetool.com/).

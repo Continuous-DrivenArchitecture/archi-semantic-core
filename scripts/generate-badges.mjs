@@ -26,17 +26,17 @@ try {
   process.exit(1);
 }
 
-const badgesDir = join(root, 'docs', 'badges');
-const flagsDir = join(root, 'docs', 'flags');
+const badgesDir = join(root, '.github', 'assets', 'badges');
+const flagsDir = join(root, '.github', 'assets', 'flags');
 await mkdir(badgesDir, { recursive: true });
 
 async function writeBadge(file, data) {
   try {
     const svg = makeBadge(data);
     await writeFile(join(badgesDir, file), svg, 'utf8');
-    console.log(`generate-badges: wrote docs/badges/${file}`);
+    console.log(`generate-badges: wrote .github/assets/badges/${file}`);
   } catch (err) {
-    console.error(`generate-badges: could not generate docs/badges/${file}: ${err.message}`);
+    console.error(`generate-badges: could not generate .github/assets/badges/${file}: ${err.message}`);
     process.exit(1);
   }
 }
@@ -45,7 +45,7 @@ async function readFlag(flag) {
   try {
     return await readFile(join(flagsDir, flag), 'utf8');
   } catch (err) {
-    console.error(`generate-badges: could not read docs/flags/${flag}: ${err.message}`);
+    console.error(`generate-badges: could not read .github/assets/flags/${flag}: ${err.message}`);
     process.exit(1);
   }
 }
@@ -56,8 +56,8 @@ await writeBadge('license.svg', { label: 'license', message: pkg.license });
 // Cache-busting: the READMEs link the static version.svg with a ?v=<version>
 // query key, so browsers (and GitHub's render cache) treat each release's
 // badge as a fresh URL instead of serving the stale one.
-const VERSION_BADGE_PATTERN = /\.\/docs\/badges\/version\.svg(?:\?v=[^)\s"]*)?/g;
-const VERSION_BADGE_LINK = `./docs/badges/version.svg?v=${pkg.version}`;
+const VERSION_BADGE_PATTERN = /\.\/\.github\/assets\/badges\/version\.svg(?:\?v=[^)\s"]*)?/g;
+const VERSION_BADGE_LINK = `./.github/assets/badges/version.svg?v=${pkg.version}`;
 
 for (const language of languages) {
   const readmePath = join(root, language.readme);
