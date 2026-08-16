@@ -1,8 +1,8 @@
 # archi-semantic-core
 
-[![npm version](./.github/assets/badges/version.svg?v=0.3.0)](https://www.npmjs.com/package/@cda/archi-semantic-core) [![License](./.github/assets/badges/license.svg)](./LICENSE)
+[![npm version](./docs/badges/version.svg?v=0.2.0)](https://www.npmjs.com/package/@cda/archi-semantic-core) [![License](./docs/badges/license.svg)](./LICENSE)
 
-[![English](./.github/assets/badges/lang-en.svg)](README.md) [![Deutsch](./.github/assets/badges/lang-de.svg)](README.de.md) [![Español](./.github/assets/badges/lang-es.svg)](README.es.md) [![Français](./.github/assets/badges/lang-fr.svg)](README.fr.md) [![Nederlands](./.github/assets/badges/lang-nl-active.svg)](README.nl.md) [![Português](./.github/assets/badges/lang-pt.svg)](README.pt.md) [![中文](./.github/assets/badges/lang-zh.svg)](README.zh.md)
+[![English](./docs/badges/lang-en.svg)](README.md) [![Deutsch](./docs/badges/lang-de.svg)](README.de.md) [![Español](./docs/badges/lang-es.svg)](README.es.md) [![Français](./docs/badges/lang-fr.svg)](README.fr.md) [![Nederlands](./docs/badges/lang-nl-active.svg)](README.nl.md) [![Português](./docs/badges/lang-pt.svg)](README.pt.md) [![中文](./docs/badges/lang-zh.svg)](README.zh.md)
 
 Een TypeScript-parser voor native `.archimate`-modelbestanden, gemaakt door de
 desktop-editor [Archi](https://www.archimatetool.com/).
@@ -46,7 +46,6 @@ kennen. Het leest ook de zip-archiefvariant van het `.archimate`-bestandsformaat
 - [Gecomprimeerde `.archimate`-bestanden (zip)](#gecomprimeerde-archimate-bestanden-zip)
 - [Validatie](#validatie)
 - [Prestaties](#prestaties)
-- [Voorbeelden](#voorbeelden)
 - [Wat wordt ondersteund](#wat-wordt-ondersteund)
 - [Wat buiten scope valt](#wat-buiten-scope-valt)
 - [Vereisten en moduleformaat](#vereisten-en-moduleformaat)
@@ -599,13 +598,6 @@ af: het parst en valideert een synthetisch model van 20.000 elementen,
 20.000 relaties en 20.000 diagramobjects binnen een vast tijdsbudget, en
 controleert dat de parse-tijd lineair groeit wanneer de modelgrootte
 verdubbelt.
-
-## Voorbeelden
-
-Kopieerklare consumptie-recepten voor het geparste model — `.archimate`-
-bestanden lezen (XML of zip), indexeren en bevragen, impactanalyse over de
-relatiegraaf, validatie als pipeline-gate en het oplossen van label
-expressions. Zie [examples/README.md](examples/README.md).
 
 ## Wat wordt ondersteund
 

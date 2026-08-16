@@ -1,8 +1,8 @@
 # archi-semantic-core
 
-[![npm version](./.github/assets/badges/version.svg?v=0.3.0)](https://www.npmjs.com/package/@cda/archi-semantic-core) [![License](./.github/assets/badges/license.svg)](./LICENSE)
+[![npm version](./docs/badges/version.svg?v=0.2.0)](https://www.npmjs.com/package/@cda/archi-semantic-core) [![License](./docs/badges/license.svg)](./LICENSE)
 
-[![English](./.github/assets/badges/lang-en.svg)](README.md) [![Deutsch](./.github/assets/badges/lang-de-active.svg)](README.de.md) [![Español](./.github/assets/badges/lang-es.svg)](README.es.md) [![Français](./.github/assets/badges/lang-fr.svg)](README.fr.md) [![Nederlands](./.github/assets/badges/lang-nl.svg)](README.nl.md) [![Português](./.github/assets/badges/lang-pt.svg)](README.pt.md) [![中文](./.github/assets/badges/lang-zh.svg)](README.zh.md)
+[![English](./docs/badges/lang-en.svg)](README.md) [![Deutsch](./docs/badges/lang-de-active.svg)](README.de.md) [![Español](./docs/badges/lang-es.svg)](README.es.md) [![Français](./docs/badges/lang-fr.svg)](README.fr.md) [![Nederlands](./docs/badges/lang-nl.svg)](README.nl.md) [![Português](./docs/badges/lang-pt.svg)](README.pt.md) [![中文](./docs/badges/lang-zh.svg)](README.zh.md)
 
 Ein TypeScript-Parser für native `.archimate`-Modelldateien, die mit dem
 Desktop-Editor [Archi](https://www.archimatetool.com/) erstellt wurden.
@@ -47,7 +47,6 @@ die ZIP-Archiv-Variante des `.archimate`-Dateiformats.
 - [Komprimierte `.archimate`-Dateien (ZIP)](#komprimierte-archimate-dateien-zip)
 - [Validierung](#validierung)
 - [Leistung](#leistung)
-- [Beispiele](#beispiele)
 - [Was abgedeckt wird](#was-abgedeckt-wird)
 - [Was außerhalb des Umfangs liegt](#was-außerhalb-des-umfangs-liegt)
 - [Anforderungen und Modulformat](#anforderungen-und-modulformat)
@@ -607,13 +606,6 @@ dies: Er parst und validiert ein synthetisches Modell mit 20.000
 Elementen, 20.000 Beziehungen und 20.000 Diagrammobjekten innerhalb eines
 festen Zeitbudgets und prüft, dass die Parse-Zeit bei doppelter
 Modellgröße linear wächst.
-
-## Beispiele
-
-Kopierfertige Konsum-Rezepte für das geparste Modell — `.archimate`-Dateien
-lesen (XML oder ZIP), Indizierung und Abfragen, Impact-Analyse über den
-Beziehungsgraphen, Validierung als Pipeline-Gate und Auflösung von Label
-Expressions. Siehe [examples/README.md](examples/README.md).
 
 ## Was abgedeckt wird
 

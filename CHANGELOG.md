@@ -1,5 +1,3 @@
-## [0.3.0](https://github.com/Continuous-DrivenArchitecture/archi-semantic-core/compare/v0.2.0...v0.3.0) (2026-08-16)
-
 ## [0.2.0](https://github.com/Continuous-DrivenArchitecture/archi-semantic-core/compare/v0.1.0...v0.2.0) (2026-08-16)
 
 ## [0.2.0](https://github.com/Continuous-DrivenArchitecture/archi-semantic-core/compare/v0.1.0...v0.2.0) (2026-08-16)
