@@ -27,3 +27,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          # Attribute the chore(release) commit to a human maintainer
+          # instead of the default @semantic-release-bot identity.
+          GIT_AUTHOR_NAME: Miguel Cespedes
+          GIT_AUTHOR_EMAIL: miguelcespedes@outlook.com
+          GIT_COMMITTER_NAME: Miguel Cespedes
+          GIT_COMMITTER_EMAIL: miguelcespedes@outlook.com
