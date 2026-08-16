@@ -1,43 +1,51 @@
-# Receta: nueva librería / repo GitHub
+# Recipe: new library / GitHub repo
 
-Checklist end-to-end para levantar un repo de `Continuous-DrivenArchitecture`
-con releases automáticos, gobernanza de identidad y `main` protegido.
-~45 minutos una vez por repo. Esta receta se aplicó por primera vez en
-`archi-semantic-core` (ver historial para ejemplos reales).
+End-to-end checklist for standing up a `Continuous-DrivenArchitecture`
+repository with automated releases, identity governance, and a protected
+`main` branch. ~45 minutes once per repo. This recipe was first applied
+to `archi-semantic-core` (see its history for real-world examples).
 
 ---
 
-## Fase 0 — Definiciones
+## Phase 0 — Definitions
 
-- Org: `Continuous-DrivenArchitecture` · Paquete: `@cda/<nombre>` · Default branch: `main`
-- Convención: **Conventional Commits** (`feat:` = minor, `fix:` = patch, `!` = breaking)
-- Decidir y documentar el alcance: qué expone la librería y qué *no* ("What this is not" en el README)
+- Org: `Continuous-DrivenArchitecture` · Package: `@cda/<name>` · Default branch: `main`
+- Convention: **Conventional Commits** (`feat:` = minor, `fix:` = patch, `!` = breaking)
+- Decide and document scope: what the library exposes and what it does
+  *not* ("What this is not" in the README)
 
-## Fase 1 — En GitHub (UI, una vez por repo)
+## Phase 1 — On GitHub (UI, once per repo)
 
-1. **Crear el repo** en la org, público, default branch `main`, **sin README** (evita el commit inicial del bot).
-2. **El sentinel** (una vez por org, se reutiliza en todos los repos): tu cuenta/org → Developer settings → GitHub Apps → New:
-   - Nombre: `cda-release-sentinel` · Homepage: `https://github.com/Continuous-DrivenArchitecture/<repo>`
-   - Permissions → Repository → **Contents: Read and write** (todo lo demás en default)
-   - **Sin webhook, sin eventos, sin OAuth** (Callback URL vacío)
-   - *Only on this account* · Guardar **App ID** + **private key** (`.pem`, se descarga una sola vez)
-3. **Instalar la app** en el repo nuevo.
-4. **Secrets del repo** (Settings → Secrets and variables → Actions):
-   - `RELEASE_APP_ID` → el número
-   - `RELEASE_APP_PRIVATE_KEY` → contenido completo del `.pem` (líneas BEGIN/END incluidas)
-   - Nada más: npm publica por **OIDC**, sin tokens
-5. **Ruleset sobre `main`** (Settings → Rules → Rulesets → New branch ruleset):
-   - Target: `main` · Bypass list: **solo la app sentinel**
+1. **Create the repo** in the org, public, default branch `main`, **no README**
+   (avoids the initial bot-authored commit).
+2. **The sentinel** (once per org, reused across repos): your account/org →
+   Developer settings → GitHub Apps → New:
+   - Name: `cda-release-sentinel` · Homepage: `https://github.com/Continuous-DrivenArchitecture/<repo>`
+   - Permissions → Repository → **Contents: Read and write** (everything else default)
+   - **No webhook, no events, no OAuth** (Callback URL empty)
+   - *Only on this account* · Save the **App ID** + **private key** (`.pem`,
+     downloadable only once)
+3. **Install the app** on the new repo.
+4. **Repo secrets** (Settings → Secrets and variables → Actions):
+   - `RELEASE_APP_ID` → the number
+   - `RELEASE_APP_PRIVATE_KEY` → full `.pem` content (BEGIN/END lines included)
+   - Nothing else: npm publishes via **OIDC**, no tokens
+5. **Ruleset on `main`** (Settings → Rules → Rulesets → New branch ruleset):
+   - Target: `main` · Bypass list: **the sentinel app only**
    - ✅ Require a pull request before merging (1 approval)
    - ✅ Require status checks: `validate`, `audit`, `sbom`
    - ✅ Block force pushes
-6. **Dependabot**: `.github/dependabot.yml` (version updates) + Settings → Code security → **enable alerts y security updates** (esto es manual, no va por archivo).
-7. **npm trusted publishing** (cuando el paquete exista publicado): npmjs.com → Settings del paquete → "Publish from GitHub Actions" → agregar `Continuous-DrivenArchitecture/<repo>`. Revocar tokens viejos y activar 2FA obligatoria en la cuenta npm.
+6. **Dependabot**: `.github/dependabot.yml` (version updates) + Settings →
+   Code security → **enable alerts and security updates** (manual, no file).
+7. **npm trusted publishing** (once the package exists on npm): npmjs.com →
+   package Settings → "Publish from GitHub Actions" → add
+   `Continuous-DrivenArchitecture/<repo>`. Revoke old tokens and enforce
+   2FA on the npm account.
 
-## Fase 2 — En local
+## Phase 2 — Locally
 
-1. `git init`; fijar identidad (`git config user.name` / `user.email`); branch `main`.
-2. `npm init` → `name: @cda/<nombre>`, `repository.url: https://github.com/Continuous-DrivenArchitecture/<repo>.git`.
+1. `git init`; set identity (`git config user.name` / `user.email`); branch `main`.
+2. `npm init` → `name: @cda/<name>`, `repository.url: https://github.com/Continuous-DrivenArchitecture/<repo>.git`.
 3. **`.releaserc.json`**:
    ```json
    {
@@ -55,39 +63,71 @@ con releases automáticos, gobernanza de identidad y `main` protegido.
      ]
    }
    ```
-4. **Workflows** (`.github/workflows/`), con **toda acción pineada a SHA** (nunca tags flotantes):
-   - `ci.yml`: `on: pull_request` + `push` (todos los branches). Jobs: `validate` (npm ci, typecheck, build, test, `npm run badges`), `audit` (`npm audit --omit=dev --audit-level=high`), `sbom` (npm sbom → upload artifact).
-   - `release.yml`: `on: push` a `main`. Mintear token del sentinel con `actions/create-github-app-token@<sha>` (secrets `RELEASE_APP_ID`/`RELEASE_APP_PRIVATE_KEY`), pasarlo a `actions/checkout` y a semantic-release como `GITHUB_TOKEN`. Fijar la **identidad humana** del commit: `GIT_AUTHOR_NAME`/`GIT_AUTHOR_EMAIL`/`GIT_COMMITTER_*` = mantenedor (no bot). `permissions: contents: write, issues: write, pull-requests: write, id-token: write`.
-   - `dependency-health.yml`: scorecard / auditoría de dependencias (como en `archi-semantic-core`).
-   - Resolver SHA de una acción: `https://api.github.com/repos/<owner>/<action>/releases/latest` → `target_commitish` (o por tag vía API).
-5. **`.github/dependabot.yml`**: `github-actions` + `npm`, semanal, `open-pull-requests-limit: 3`.
-6. **`CONTRIBUTING.md`**: Conventional Commits, no tocar `package.json`/`CHANGELOG.md` a mano, regla del SHA, estrategia de ramas (develop/main, sync post-release).
-7. **README** (7 idiomas) + `.github/assets/badges` (script `scripts/generate-badges.mjs` regenera badges y el cache-busting `?v=` de los README; se actualizan solos en el CI del commit de release). `docs/` queda vacío, reservado para el futuro sitio Starlight.
-8. **Ramas**: `git checkout -b develop` — el trabajo vive ahí; `main` solo recibe PRs.
+4. **Workflows** (`.github/workflows/`), with **every action pinned to a full
+   commit SHA** (never floating tags):
+   - `ci.yml`: `on: pull_request` + `push` (all branches). Jobs: `validate`
+     (npm ci, typecheck, build, test, `npm run badges`), `audit`
+     (`npm audit --omit=dev --audit-level=high`), `sbom` (npm sbom →
+     upload artifact).
+   - `release.yml`: `on: push` to `main`. Mint a sentinel token with
+     `actions/create-github-app-token@<sha>` (secrets `RELEASE_APP_ID` /
+     `RELEASE_APP_PRIVATE_KEY`), pass it to `actions/checkout` and to
+     semantic-release as `GITHUB_TOKEN`. Set the **human commit identity**:
+     `GIT_AUTHOR_NAME` / `GIT_AUTHOR_EMAIL` / `GIT_COMMITTER_*` = maintainer
+     (not the bot). `permissions: contents: write, issues: write,
+     pull-requests: write, id-token: write`.
+   - `dependency-health.yml`: scorecard / dependency audit (as in
+     `archi-semantic-core`).
+   - Resolve an action's SHA: `https://api.github.com/repos/<owner>/<action>/releases/latest`
+     → `target_commitish` (or by tag via API).
+5. **`.github/dependabot.yml`**: `github-actions` + `npm`, weekly,
+   `open-pull-requests-limit: 3`.
+6. **`CONTRIBUTING.md`**: Conventional Commits, never touch
+   `package.json`/`CHANGELOG.md` manually, SHA rule, branching strategy
+   (develop/main, post-release sync).
+7. **README** (7 languages) + `.github/assets/badges` (the
+   `scripts/generate-badges.mjs` script regenerates badges and the `?v=`
+   cache-busting key in the READMEs; they refresh automatically in the CI
+   run on the release commit). `docs/` is reserved for the future public
+   Starlight site (kept separate from `.github/` recipes).
+8. **Branches**: `git checkout -b develop` — work lives there; `main` only
+   receives PRs.
 
-## Fase 3 — Verificación del primer release
+## Phase 3 — First release verification
 
-1. `git push -u origin develop` → CI verde en develop.
-2. PR `develop → main` (primer commit: `chore(init)` o `docs:`) → merge (te exige CI por el ruleset).
-3. El merge dispara el release 0.1.0. Verificar:
-   - Commit `chore(release): 0.1.0` **autor = humano**, tag `v0.1.0` apuntando a main
-   - npm 0.1.0 publicado con **provenance** (OIDC, sin token)
-   - GitHub Release con notas generadas
-   - Contributor graph: solo humanos
+1. `git push -u origin develop` → CI green on develop.
+2. PR `develop → main` (first commit: `chore(init)` or `docs:`) → merge
+   (the ruleset enforces CI).
+3. The merge triggers the 0.1.0 release. Verify:
+   - `chore(release): 0.1.0` commit **authored by a human**, tag `v0.1.0`
+     pointing at main
+   - npm 0.1.0 published with **provenance** (OIDC, no token)
+   - GitHub Release with generated notes
+   - Contributor graph: humans only
 4. Sync: `git checkout develop && git merge main && git push origin develop`.
 
-## Fase 4 — Mantenimiento
+## Phase 4 — Maintenance
 
-- Mergear PRs de Dependabot tras revisar (cuidado con los **majors**, v4→v7 cambia compat).
-- Cada release es automático: versión, CHANGELOG, badges, npm, GitHub Release.
-- Tras cada release: sync de `develop` (Fase 3, paso 4).
-- Regla de oro: **jamás reutilizar un tag o versión fallida** — subir de versión.
+- Merge Dependabot PRs after review (watch out for **majors**, v4→v7
+  changes compatibility).
+- Every release is automatic: version, CHANGELOG, badges, npm, GitHub Release.
+- After each release: sync `develop` (Phase 3, step 4).
+- Golden rule: **never reuse a failed tag or version** — bump instead.
 
-## Trampas conocidas (lecciones de `archi-semantic-core`)
+## Known pitfalls (lessons from `archi-semantic-core`)
 
-- **No existe "GitHub Actions" en el bypass list** del ruleset, y el `GITHUB_TOKEN` **no puede** bypasear rulesets (GH006/GH013): el push del `chore(release)` falla a menos que uses una GitHub App como bypass actor. Es el motivo del sentinel.
-- El push del sentinel **sí dispara workflows** (a diferencia del GITHUB_TOKEN): el `[skip ci]` en el mensaje del release evita recursión.
-- **No borrar `NPM_TOKEN`** antes de enrolar trusted publishing en npmjs.com, o el próximo release falla al publicar.
-- Si semantic-release publica sin tag/commit (versión duplicada por historia huérfana): apuntar el tag a main y **recrear la release manualmente** para que el autor sea el humano.
-- El bot puede dejar `refs/notes/semantic-release-*` que ensucian el gráfico de contribuidores: borrarlas con `git push origin --delete refs/notes/<ref>`.
-- Las acciones de GitHub tienen tags v4/v7 **lightweight** (móviles): por eso se pinean a SHA.
+- **There is no "GitHub Actions" entry in the ruleset bypass list**, and the
+  `GITHUB_TOKEN` **cannot** bypass rulesets (GH006/GH013): the
+  `chore(release)` push to `main` fails unless a GitHub App is the bypass
+  actor. That is why the sentinel exists.
+- Sentinel pushes **do trigger workflows** (unlike `GITHUB_TOKEN`): the
+  `[skip ci]` marker in the release message prevents recursion.
+- **Do not delete `NPM_TOKEN`** before enrolling trusted publishing on
+  npmjs.com, or the next release fails at publish time.
+- If semantic-release publishes without a tag/commit (duplicate version due
+  to orphaned history): point the tag at `main` and **recreate the release
+  manually** so the author is the human.
+- The bot may leave `refs/notes/semantic-release-*` that pollute the
+  contributor graph: remove them with `git push origin --delete refs/notes/<ref>`.
+- GitHub action tags (v4/v7) are **lightweight** (mutable): that is why
+  actions are pinned to SHAs.
