@@ -5,7 +5,7 @@ con releases automáticos, gobernanza de identidad y `main` protegido.
 ~45 minutos una vez por repo. Esta receta se aplicó por primera vez en
 `archi-semantic-core` (ver su historial para ejemplos reales).
 
-[![English](./.github/assets/badges/lang-en.svg)](NEW-REPO.md) [![Español](./.github/assets/badges/lang-es-active.svg)](NEW-REPO.es.md)
+[![English](./.github/assets/badges/lang-en.svg)](new-repo.md) [![Español](./.github/assets/badges/lang-es-active.svg)](new-repo.es.md)
 
 ---
 
