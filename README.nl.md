@@ -22,6 +22,7 @@ kennen. Het leest ook de zip-archiefvariant van het `.archimate`-bestandsformaat
 
 - [Waarvoor dit pakket dient](#waarvoor-dit-pakket-dient)
 - [Wat dit pakket niet is](#wat-dit-pakket-niet-is)
+- [Waar dit past](#waar-dit-past)
 - [Installatie](#installatie)
 - [Gebruik](#gebruik)
 - [API](#api)
@@ -82,6 +83,14 @@ thuishoren.
 
 Dit project is niet gelieerd aan en wordt niet onderschreven door Archi, het
 Archi Tool-project of The Open Group.
+
+## Waar dit past
+
+`archi-semantic-core` is de eerste hoeksteen van het
+Continuous-DrivenArchitecture-ecosysteem: het levert de Archi-kennisgraaf —
+een getrouw, getypt model van hoe een ontwerp in de Archi-editor is opgebouwd —
+die downstream-tools zullen gebruiken voor impactanalyse, driftdetectie en
+architectuurevolutie.
 
 ## Installatie
 

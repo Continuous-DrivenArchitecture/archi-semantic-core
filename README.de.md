@@ -23,6 +23,7 @@ die ZIP-Archiv-Variante des `.archimate`-Dateiformats.
 
 - [Wofür dieses Paket gedacht ist](#wofür-dieses-paket-gedacht-ist)
 - [Was dieses Paket nicht ist](#was-dieses-paket-nicht-ist)
+- [Wo es einzuordnen ist](#wo-es-einzuordnen-ist)
 - [Installation](#installation)
 - [Verwendung](#verwendung)
 - [API](#api)
@@ -83,6 +84,14 @@ Das sind eigenständige Belange und gehören in separate Pakete.
 Dieses Projekt steht in keiner Verbindung zu Archi, dem Archi-Tool-Projekt
 oder The Open Group und wird von keinem von ihnen unterstützt oder
 befürwortet.
+
+## Wo es einzuordnen ist
+
+`archi-semantic-core` ist der erste Grundstein des
+Continuous-DrivenArchitecture-Ökosystems: Es liefert den Archi-Wissensgraphen —
+ein getreues, typisiertes Modell davon, wie ein Entwurf im Archi-Editor
+aufgebaut ist — den nachgelagerte Werkzeuge für Wirkungsanalyse,
+Abweichungserkennung und Architekturentwicklung nutzen werden.
 
 ## Installation
 

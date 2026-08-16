@@ -23,6 +23,7 @@ du format de fichier `.archimate`.
 
 - [À quoi sert ce paquet](#à-quoi-sert-ce-paquet)
 - [Ce que ce paquet n'est pas](#ce-que-ce-paquet-nest-pas)
+- [Où cela s'inscrit](#où-cela-sinscrit)
 - [Installation](#installation)
 - [Utilisation](#utilisation)
 - [API](#api)
@@ -82,6 +83,14 @@ Ce sont des préoccupations distinctes qui relèvent de paquets séparés.
 
 Ce projet n'est ni affilié à, ni approuvé par, Archi, le projet Archi Tool,
 ou The Open Group.
+
+## Où cela s'inscrit
+
+`archi-semantic-core` est la première pierre angulaire de l'écosystème
+Continuous-DrivenArchitecture : il fournit le graphe de connaissances d'Archi —
+un modèle fidèle et typé de la façon dont un design est construit dans l'éditeur
+Archi — que les outils en aval consommeront pour l'analyse d'impact, la
+détection de dérive et l'évolution de l'architecture.
 
 ## Installation
 

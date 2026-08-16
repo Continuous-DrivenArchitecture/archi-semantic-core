@@ -22,6 +22,7 @@ reads the zip-archive variant of the `.archimate` file format.
 
 - [What this package is for](#what-this-package-is-for)
 - [What this is not](#what-this-is-not)
+- [Where this fits](#where-this-fits)
 - [Install](#install)
 - [Usage](#usage)
 - [API](#api)
@@ -79,6 +80,13 @@ Those are separate concerns and belong in separate packages.
 
 This project is not affiliated with or endorsed by Archi, the Archi Tool
 project, or The Open Group.
+
+## Where this fits
+
+`archi-semantic-core` is the first cornerstone of the Continuous-DrivenArchitecture
+ecosystem: it provides the Archi knowledge graph — a faithful, typed model of how a
+design is built in the Archi editor — that downstream tools will consume for impact
+analysis, drift detection, and architecture evolution.
 
 ## Install
 
