@@ -31,4 +31,9 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npm audit --audit-level=high
+      # Audits the production dependency tree (the only deps that ship to
+      # consumers). Dev-only tooling is excluded: its reported issues are
+      # inside npm's own bundled dependencies (tar, brace-expansion,
+      # ip-address, undici) pulled in via @semantic-release/npm, which are
+      # not fixable from this repo and never reach the published package.
+      - run: npm audit --omit=dev --audit-level=high
