@@ -4,7 +4,7 @@
 
 [![English](./.github/assets/badges/lang-en-active.svg)](README.md) [![Deutsch](./.github/assets/badges/lang-de.svg)](README.de.md) [![Español](./.github/assets/badges/lang-es.svg)](README.es.md) [![Français](./.github/assets/badges/lang-fr.svg)](README.fr.md) [![Nederlands](./.github/assets/badges/lang-nl.svg)](README.nl.md) [![Português](./.github/assets/badges/lang-pt.svg)](README.pt.md) [![中文](./.github/assets/badges/lang-zh.svg)](README.zh.md)
 
-[![Documentation](https://img.shields.io/badge/documentation-continuous--drivenarchitecture.github.io/archi--semantic--core-blue.svg?labelColor=0B5FFF&color=0A3F9E)](https://continuous-drivenarchitecture.github.io/archi-semantic-core/)
+[![Documentation](https://img.shields.io/badge/documentation-CDA_Developer_Portal-blue.svg?labelColor=0B5FFF&color=0A3F9E)](https://continuous-drivenarchitecture.github.io/developer-portal/)
 
 A TypeScript parser for native `.archimate` model files created by the
 [Archi](https://www.archimatetool.com/) desktop editor.
@@ -96,10 +96,10 @@ navigable graph on top, instead of this package trying to be one itself.
 
 ## Documentation
 
-Full documentation is available at
-[continuous-drivenarchitecture.github.io/archi-semantic-core](https://continuous-drivenarchitecture.github.io/archi-semantic-core/),
+Full documentation is available in the
+[CDA Developer Portal](https://continuous-drivenarchitecture.github.io/developer-portal/),
 including getting-started guides, core concepts, guides, the compatibility
-matrix, and the generated API reference.
+matrix, and the generated API reference for this library.
 
 ## Install
 
