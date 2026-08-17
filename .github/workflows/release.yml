@@ -34,6 +34,18 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      # dist/ is gitignored, so a clean checkout has no build output. The
+      # artifact must be built explicitly BEFORE semantic-release: the npm
+      # publish never runs prepublishOnly because .npmrc sets
+      # ignore-scripts=true (which also keeps npm ci deterministic).
+      - run: npm run typecheck
+      - run: npm run build
+      - run: npm test
+      # Strong pre-publish guard: `npm pack --dry-run` must list dist/ files
+      # in the exact payload npm would publish. Fails the release before any
+      # broken tarball can reach the registry.
+      - name: Validate publishable payload
+        run: node scripts/verify-pack.mjs
       - run: npx semantic-release
         env:
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
