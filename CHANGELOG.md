@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.4.0](https://github.com/Continuous-DrivenArchitecture/archi-semantic-core/compare/v0.3.1...v0.4.0) (2026-08-17)
+
+### Features
+
+* **archive:** expose Node archive support through dedicated subpath ([af3dcca](https://github.com/Continuous-DrivenArchitecture/archi-semantic-core/commit/af3dccad0645c6bf74084fa23cc4db3d2197240e)), closes [#10](https://github.com/Continuous-DrivenArchitecture/archi-semantic-core/issues/10)
+
 All notable changes to this package are documented in this file.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
