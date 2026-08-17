@@ -86,9 +86,10 @@ project, or The Open Group.
 ## Where this fits
 
 `archi-semantic-core` is the first cornerstone of the Continuous-DrivenArchitecture
-ecosystem: it provides the Archi knowledge graph — a faithful, typed model of how a
-design is built in the Archi editor — that downstream tools will consume for impact
-analysis, drift detection, and architecture evolution.
+ecosystem: it is a faithful, typed semantic representation of how a design is built
+in the Archi editor. Downstream tools consume that representation for impact
+analysis, drift detection, and architecture evolution — layers that may build a
+navigable graph on top, instead of this package trying to be one itself.
 
 ## Install
 
@@ -128,7 +129,8 @@ shape:
 
 ```ts
 import { readFileSync } from 'node:fs';
-import { extractArchiModelXml, parseArchiModel } from '@cda/archi-semantic-core';
+import { extractArchiModelXml } from '@cda/archi-semantic-core/archive';
+import { parseArchiModel } from '@cda/archi-semantic-core';
 
 const bytes = readFileSync('MyModel.archimate');
 const xml = extractArchiModelXml(bytes); // handles plain XML or a zip archive
@@ -153,6 +155,9 @@ This validator is not an enterprise-architecture quality linter. A model can
 be structurally valid and still represent poor architecture.
 
 ### `extractArchiModelXml(bytes: Uint8Array): string`
+
+> Node-only, exported from the `@cda/archi-semantic-core/archive` subpath
+> (uses `node:zlib`; the root entrypoint stays browser-safe).
 
 Returns the model XML text from raw `.archimate` file bytes, whether the file
 is plain XML or Archi's zip-archive variant (`model.xml` plus an `images/`
@@ -517,7 +522,8 @@ recovery.
 
 ```ts
 import { readFileSync } from 'node:fs';
-import { extractArchiModelXml, parseArchiModel } from '@cda/archi-semantic-core';
+import { extractArchiModelXml } from '@cda/archi-semantic-core/archive';
+import { parseArchiModel } from '@cda/archi-semantic-core';
 
 const bytes = readFileSync('MyModel.archimate'); // read as bytes, not text
 const xml = extractArchiModelXml(bytes);

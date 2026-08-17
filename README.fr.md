@@ -89,10 +89,12 @@ ou The Open Group.
 ## Où cela s'inscrit
 
 `archi-semantic-core` est la première pierre angulaire de l'écosystème
-Continuous-DrivenArchitecture : il fournit le graphe de connaissances d'Archi —
-un modèle fidèle et typé de la façon dont un design est construit dans l'éditeur
-Archi — que les outils en aval consommeront pour l'analyse d'impact, la
-détection de dérive et l'évolution de l'architecture.
+Continuous-DrivenArchitecture : une représentation sémantique fidèle et typée de
+la façon dont un design est construit dans l'éditeur Archi. Les outils en aval
+consomment cette représentation pour l'analyse d'impact, la
+détection de dérive et l'évolution de l'architecture — des couches qui peuvent
+construire un graphe navigable par-dessus, au lieu que ce paquet essaie d'en être
+un lui-même.
 
 ## Installation
 
@@ -134,7 +136,8 @@ forme :
 
 ```ts
 import { readFileSync } from 'node:fs';
-import { extractArchiModelXml, parseArchiModel } from '@cda/archi-semantic-core';
+import { extractArchiModelXml } from '@cda/archi-semantic-core/archive';
+import { parseArchiModel } from '@cda/archi-semantic-core';
 
 const bytes = readFileSync('MonModele.archimate');
 const xml = extractArchiModelXml(bytes); // gère le XML brut ou une archive zip
@@ -162,6 +165,10 @@ modèle peut être structurellement valide tout en représentant une mauvaise
 architecture.
 
 ### `extractArchiModelXml(bytes: Uint8Array): string`
+
+> Node uniquement : exporté depuis le sous-chemin
+> `@cda/archi-semantic-core/archive` (utilise `node:zlib` ; le point d'entrée
+> racine reste sûr pour le navigateur).
 
 Renvoie le texte XML du modèle à partir des octets bruts d'un fichier
 `.archimate`, qu'il s'agisse de XML brut ou de la variante archive zip
@@ -549,7 +556,8 @@ détecter le format le corromprait de manière irrécupérable.
 
 ```ts
 import { readFileSync } from 'node:fs';
-import { extractArchiModelXml, parseArchiModel } from '@cda/archi-semantic-core';
+import { extractArchiModelXml } from '@cda/archi-semantic-core/archive';
+import { parseArchiModel } from '@cda/archi-semantic-core';
 
 const bytes = readFileSync('MonModele.archimate'); // lu en tant qu'octets, pas en tant que texte
 const xml = extractArchiModelXml(bytes);

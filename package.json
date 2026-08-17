@@ -1,7 +1,7 @@
 {
   "name": "@cda/archi-semantic-core",
   "version": "0.3.1",
-  "description": "The foundational semantic core of the Continuous-Driven Architecture (CDA) ecosystem. Translates native Archi files into an intelligent, typed domain graph ready for automated governance and GitOps pipelines.",
+  "description": "The foundational semantic core of the Continuous-Driven Architecture (CDA) ecosystem. Translates native Archi files into a faithful, typed semantic representation ready for automated governance and GitOps pipelines.",
   "keywords": [
     "archimate",
     "archi",
@@ -21,6 +21,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./archive": {
+      "types": "./dist/archive.d.ts",
+      "import": "./dist/archive.js"
     }
   },
   "files": [
@@ -36,6 +40,7 @@
     "build": "tsc -p tsconfig.build.json",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:published": "node scripts/verify-published-consumption.mjs",
     "badges": "node scripts/generate-badges.mjs",
     "prepublishOnly": "npm run typecheck && npm run build && npm test && npm run badges"
   },
