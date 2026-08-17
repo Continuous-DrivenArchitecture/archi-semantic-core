@@ -49,7 +49,7 @@ jobs:
       # instead of silently polluting the contributor graph again.
       - name: Verify release commit author
         run: |
-          author="$(git log -1 --format=%an <%ae>)"
+          author="$(git log -1 --format='%an <%ae>')"
           expected="Miguel Cespedes <miguelcespedes@outlook.com>"
           if [ "$author" != "$expected" ]; then
             echo "::error::release commit authored by '$author', expected '$expected'" >&2
