@@ -3,7 +3,9 @@ name: docs
 on:
   push:
     branches:
-      - main
+      # TEMPORARY: the site is being served from `develop` while the docs
+      # aesthetics are being polished. Revert to `main` once done.
+      - develop
     paths:
       - 'website/**'
       - 'src/**'
