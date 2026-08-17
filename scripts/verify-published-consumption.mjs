@@ -10,6 +10,8 @@ const workspace = mkdtempSync(join(tmpdir(), 'archi-consumption-'));
 let failed = false;
 let tarball = null;
 
+const REQUIRED_DIST = ['dist/index.js', 'dist/index.d.ts', 'dist/archive.js', 'dist/archive.d.ts'];
+
 function run(command, cwd, opts = {}) {
   console.log(`$ ${command}`);
   execSync(command, { cwd, stdio: 'inherit', ...opts });
@@ -25,7 +27,17 @@ function assert(condition, message) {
 }
 
 try {
-  run('npm run build', repoRoot);
+  // No build happens here on purpose: this check must exercise the artifact
+  // as produced by the pipeline's build step. If dist/ is missing, the
+  // release is broken and this script fails instead of silently fixing it.
+  const missingDist = REQUIRED_DIST.filter((p) => !existsSync(join(repoRoot, p)));
+  if (missingDist.length > 0) {
+    console.error(`FAIL: local build output is incomplete (missing: ${missingDist.join(', ')}).`);
+    console.error('The release pipeline must run `npm run build` before `npm run test:published`.');
+    process.exit(1);
+  }
+  console.log(`PASS: local build output present (${REQUIRED_DIST.join(', ')})`);
+
   const pack = JSON.parse(execSync('npm pack --json', { cwd: repoRoot, encoding: 'utf8' })).at(-1);
   tarball = join(repoRoot, pack.filename);
   console.log(`packed: ${pack.name}@${pack.version} (${tarball})`);
