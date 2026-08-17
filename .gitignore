@@ -5,3 +5,9 @@ coverage/
 .env
 .DS_Store
 Thumbs.db
+
+# documentation site
+website/node_modules/
+website/dist/
+website/.astro/
+website/src/content/docs/reference/generated/

@@ -1,0 +1,17 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": ["../src/index.ts", "../src/archive.ts"],
+  "entryPointStrategy": "expand",
+  "tsconfig": "./tsconfig.typedoc.json",
+  "out": "src/content/docs/reference/generated",
+  "plugin": [
+    "typedoc-plugin-markdown",
+    "typedoc-plugin-frontmatter",
+    "./typedoc.starlight-plugin.mjs"
+  ],
+  "excludeInternal": true,
+  "excludePrivate": true,
+  "readme": "none",
+  "sanitizeComments": true,
+  "gitRevision": "develop"
+}

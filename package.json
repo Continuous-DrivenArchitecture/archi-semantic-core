@@ -42,7 +42,10 @@
     "test:watch": "vitest",
     "test:published": "node scripts/verify-published-consumption.mjs",
     "badges": "node scripts/generate-badges.mjs",
-    "prepublishOnly": "npm run typecheck && npm run build && npm test && npm run badges"
+    "prepublishOnly": "npm run typecheck && npm run build && npm test && npm run badges",
+    "docs:dev": "npm --prefix website run dev",
+    "docs:build": "npm --prefix website run build",
+    "docs:api": "npm --prefix website run gen:api"
   },
   "dependencies": {
     "fast-xml-parser": "^5.10.1"

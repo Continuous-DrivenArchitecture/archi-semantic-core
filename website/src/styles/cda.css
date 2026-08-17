@@ -1,0 +1,274 @@
+/*
+ * CDA Developer Documentation — design system for @cda/archi-semantic-core.
+ *
+ * Overrides the Starlight default surface with the CDA electric-blue accent
+ * while keeping the base components (nav, cards, badges, code) untouched.
+ */
+
+/* ---------- Theme tokens ---------- */
+
+:root {
+  /* CDA electric blue, applied as the site's only accent. */
+  --cda-blue-50: #eff5ff;
+  --cda-blue-100: #dbe8ff;
+  --cda-blue-300: #7cb2ff;
+  --cda-blue-500: #0b5fff;
+  --cda-blue-600: #084fc9;
+  --cda-blue-700: #0a3f9e;
+
+  /* Typography: system-first, no webfont download. */
+  --sl-font: "Inter", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  --sl-font-mono: ui-monospace, "Cascadia Code", "JetBrains Mono", "SF Mono",
+    "Source Code Pro", Consolas, "Liberation Mono", monospace;
+
+  /* Accent mapping (Starlight accent token set). */
+  --sl-color-accent-low: var(--cda-blue-50);
+  --sl-color-accent: var(--cda-blue-500);
+  --sl-color-accent-high: var(--cda-blue-700);
+}
+
+:root[data-theme="light"] {
+  --sl-color-accent-low: var(--cda-blue-50);
+  --sl-color-accent: var(--cda-blue-500);
+  --sl-color-accent-high: var(--cda-blue-700);
+}
+
+:root[data-theme="dark"] {
+  --sl-color-accent-low: #0a1f45;
+  --sl-color-accent: var(--cda-blue-300);
+  --sl-color-accent-high: var(--cda-blue-100);
+  --cda-surface: #0d1117;
+}
+
+/* ---------- Surfaces ---------- */
+
+:root[data-theme="light"] {
+  --cda-surface: #fbfcfe;
+}
+
+.site-frame,
+body {
+  background: var(--cda-surface);
+}
+
+/* Thin, quiet borders instead of heavy shadows. */
+.site-frame .sidebar,
+.site-frame .main-frame > .main-pane > header,
+.site-frame .right-sidebar-panel {
+  border-color: color-mix(in srgb, var(--sl-color-gray-5) 55%, transparent);
+}
+
+/* ---------- Header ---------- */
+
+.site-title {
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+
+.site-title > a > span {
+  font-size: 1.02rem;
+}
+
+/* ---------- Typography in content ---------- */
+
+.main-frame .sl-markdown-content {
+  line-height: 1.7;
+}
+
+.main-frame .sl-markdown-content h1 {
+  letter-spacing: -0.02em;
+  font-weight: 700;
+}
+
+.main-frame .sl-markdown-content h2 {
+  letter-spacing: -0.01em;
+  font-weight: 650;
+}
+
+.main-frame .sl-markdown-content p {
+  max-width: 72ch;
+}
+
+/* ---------- Homepage (splash) ---------- */
+
+.hero {
+  padding-block: 3.5rem 1rem;
+}
+
+.hero .tagline {
+  font-size: 1.125rem;
+  color: var(--sl-color-gray-3);
+  max-width: 46ch;
+  margin-inline: auto;
+}
+
+.hero .actions {
+  margin-top: 2rem;
+}
+
+.hero .actions a {
+  font-weight: 600;
+}
+
+/* `npm install` block on the homepage. */
+.cda-install {
+  margin-block: 2.5rem auto;
+  max-width: 34rem;
+  margin-inline: auto;
+}
+
+.cda-install pre {
+  margin: 0;
+  padding: 0.9rem 1.1rem;
+  border-radius: 8px;
+  border: 1px solid var(--sl-color-hairline);
+  background: var(--sl-color-gray-6);
+  font-size: 0.95rem;
+}
+
+.cda-install code {
+  font-family: var(--sl-font-mono);
+  color: var(--sl-color-accent-high);
+}
+
+/* Pipeline: .archimate → core → ArchiModel. */
+.cda-pipeline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-block: 2.5rem 3.5rem;
+}
+
+.cda-pipeline .step {
+  border: 1px solid var(--sl-color-hairline);
+  border-radius: 8px;
+  padding: 0.6rem 1.1rem;
+  background: var(--sl-color-gray-6);
+  font-family: var(--sl-font-mono);
+  font-size: 0.9rem;
+  color: var(--sl-color-gray-2);
+}
+
+.cda-pipeline .step strong {
+  color: var(--sl-color-gray-1);
+  font-weight: 600;
+}
+
+.cda-pipeline .step.core {
+  border-color: var(--cda-blue-300);
+  background: var(--cda-blue-50);
+  color: var(--cda-blue-700);
+}
+
+:root[data-theme="dark"] .cda-pipeline .step.core {
+  border-color: var(--cda-blue-500);
+  background: #0a1f45;
+  color: var(--cda-blue-100);
+}
+
+.cda-pipeline .arrow {
+  color: var(--sl-color-gray-4);
+  font-size: 1.1rem;
+  line-height: 1;
+  user-select: none;
+}
+
+/* Three capabilities: restrained cards, hairline borders. */
+.cda-capabilities {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 1rem;
+  margin-block: 2.5rem 3.5rem;
+  text-align: left;
+}
+
+.cda-capability {
+  border: 1px solid var(--sl-color-hairline);
+  border-radius: 10px;
+  padding: 1.4rem 1.5rem 1.5rem;
+  background: var(--sl-color-gray-6);
+}
+
+.cda-capability h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1.05rem;
+  font-weight: 650;
+}
+
+.cda-capability h3 .cda-kicker {
+  display: block;
+  font-family: var(--sl-font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--cda-blue-500);
+  margin-bottom: 0.35rem;
+}
+
+.cda-capability p {
+  margin: 0;
+  font-size: 0.94rem;
+  color: var(--sl-color-gray-3);
+}
+
+/* Homepage section headings. */
+.cda-section-head {
+  text-align: center;
+  margin-top: 3.5rem;
+}
+
+.cda-section-head h2 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin-bottom: 0.4rem;
+}
+
+.cda-section-head p {
+  margin: 0 auto;
+  max-width: 52ch;
+  color: var(--sl-color-gray-3);
+  font-size: 0.98rem;
+}
+
+/* Homepage code example block. */
+.cda-example {
+  max-width: 44rem;
+  margin: 1.5rem auto 0;
+  text-align: left;
+}
+
+.cda-example .cda-example-caption {
+  font-family: var(--sl-font-mono);
+  font-size: 0.78rem;
+  color: var(--sl-color-gray-4);
+  margin-bottom: 0.5rem;
+}
+
+/* ---------- Tables ---------- */
+
+.main-frame .sl-markdown-content table {
+  font-size: 0.92rem;
+}
+
+.main-frame .sl-markdown-content th {
+  font-weight: 650;
+}
+
+/* ---------- Focus ---------- */
+
+:focus-visible {
+  outline-color: var(--sl-color-accent);
+}
+
+/* ---------- Motion: restrained ---------- */
+
+@media (prefers-reduced-motion: no-preference) {
+  .hero .actions a {
+    transition: background-color 120ms ease, color 120ms ease;
+  }
+}

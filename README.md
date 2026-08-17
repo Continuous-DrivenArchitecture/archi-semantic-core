@@ -4,6 +4,8 @@
 
 [![English](./.github/assets/badges/lang-en-active.svg)](README.md) [![Deutsch](./.github/assets/badges/lang-de.svg)](README.de.md) [![Español](./.github/assets/badges/lang-es.svg)](README.es.md) [![Français](./.github/assets/badges/lang-fr.svg)](README.fr.md) [![Nederlands](./.github/assets/badges/lang-nl.svg)](README.nl.md) [![Português](./.github/assets/badges/lang-pt.svg)](README.pt.md) [![中文](./.github/assets/badges/lang-zh.svg)](README.zh.md)
 
+[![Documentation](https://img.shields.io/badge/documentation-continuous--drivenarchitecture.github.io/archi--semantic--core-blue.svg?labelColor=0B5FFF&color=0A3F9E)](https://continuous-drivenarchitecture.github.io/archi-semantic-core/)
+
 A TypeScript parser for native `.archimate` model files created by the
 [Archi](https://www.archimatetool.com/) desktop editor.
 
@@ -23,6 +25,7 @@ reads the zip-archive variant of the `.archimate` file format.
 - [What this package is for](#what-this-package-is-for)
 - [What this is not](#what-this-is-not)
 - [Where this fits](#where-this-fits)
+- [Documentation](#documentation)
 - [Install](#install)
 - [Usage](#usage)
 - [API](#api)
@@ -90,6 +93,13 @@ ecosystem: it is a faithful, typed semantic representation of how a design is bu
 in the Archi editor. Downstream tools consume that representation for impact
 analysis, drift detection, and architecture evolution — layers that may build a
 navigable graph on top, instead of this package trying to be one itself.
+
+## Documentation
+
+Full documentation is available at
+[continuous-drivenarchitecture.github.io/archi-semantic-core](https://continuous-drivenarchitecture.github.io/archi-semantic-core/),
+including getting-started guides, core concepts, guides, the compatibility
+matrix, and the generated API reference.
 
 ## Install
 

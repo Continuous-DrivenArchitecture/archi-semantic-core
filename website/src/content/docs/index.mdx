@@ -1,0 +1,78 @@
+---
+title: archi-semantic-core
+description: A faithful, typed TypeScript semantic core for native Archi .archimate models.
+template: splash
+hero:
+  title: archi-semantic-core
+  tagline: Native Archi models. Clean TypeScript semantics. Parse `.archimate` files into a faithful, typed representation ready for software tooling.
+  actions:
+    - text: Get started
+      link: /getting-started/introduction/
+      icon: right-arrow
+    - text: GitHub
+      link: https://github.com/Continuous-DrivenArchitecture/archi-semantic-core
+      icon: external
+      variant: minimal
+---
+
+import rootPkg from '../../../../package.json';
+
+<div class="cda-install">
+<pre><code>npm install <span>@cda/archi-semantic-core</span></code></pre>
+</div>
+
+<div class="cda-pipeline" role="img" aria-label=".archimate goes into archi-semantic-core, which produces an ArchiModel">
+  <span class="step">.archimate</span>
+  <span class="arrow" aria-hidden="true">↓</span>
+  <span class="step core"><strong>archi-semantic-core</strong></span>
+  <span class="arrow" aria-hidden="true">↓</span>
+  <span class="step"><strong>ArchiModel</strong> — typed semantic model</span>
+</div>
+
+<div class="cda-section-head">
+<h2>What it does</h2>
+<p>The package reads Archi's native XML and exposes its semantics without reinterpreting them for another standard.</p>
+</div>
+
+<div class="cda-capabilities">
+
+<div class="cda-capability">
+<h3><span class="cda-kicker">Parse</span>Read native Archi models</h3>
+<p>Work programmatically with an Archi model without touching Archi's XML structure — folders, elements, relationships, views and diagrams.</p>
+</div>
+
+<div class="cda-capability">
+<h3><span class="cda-kicker">Validate</span>Check structural integrity</h3>
+<p>Detect missing or duplicate ids and dangling cross-references across all seven id-bearing collections with one call.</p>
+</div>
+
+<div class="cda-capability">
+<h3><span class="cda-kicker">Build</span>Consume the typed model</h3>
+<p>Use the resulting <code>ArchiModel</code> as a foundation for impact analysis, governance, GitOps, IDEs and other developer tooling.</p>
+</div>
+
+</div>
+
+<div class="cda-section-head">
+<h2>In two lines</h2>
+<p>v{rootPkg.version} · ESM · Node {rootPkg.engines.node.replaceAll(' || ', ', ')} and modern browser bundlers</p>
+</div>
+
+<div class="cda-example">
+<div class="cda-example-caption">TypeScript — parse and validate</div>
+
+```ts
+import { parseArchiModel, validateArchiModel } from '@cda/archi-semantic-core';
+
+const model = parseArchiModel(xml);
+
+console.log(model.elements[0].type); // "BusinessActor", not "archimate:BusinessActor"
+
+const { valid, errors } = validateArchiModel(model);
+```
+
+</div>
+
+<div class="cda-section-head">
+<p>Not an ArchiMate Model Exchange parser. Not an editor, renderer or graph engine — a faithful semantic core, built as the first cornerstone of the <a href="https://github.com/Continuous-DrivenArchitecture">Continuous-Driven Architecture</a> (CDA) ecosystem.</p>
+</div>
