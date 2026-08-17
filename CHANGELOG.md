@@ -1,3 +1,10 @@
+# Changelog
+
+All notable changes to this package are documented in this file.
+
+The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/).
+
 ## [0.3.1](https://github.com/Continuous-DrivenArchitecture/archi-semantic-core/compare/v0.3.0...v0.3.1) (2026-08-16)
 
 ### Bug Fixes
@@ -48,12 +55,21 @@
 
 ## [0.2.0](https://github.com/Continuous-DrivenArchitecture/archi-semantic-core/compare/v0.1.0...v0.2.0) (2026-08-16)
 
-# Changelog
+### Changed
 
-All notable changes to this package are documented in this file.
+- Label expressions now resolve in O(1) per node — linear time on
+  arbitrarily large models (previously O(n²)).
+- Zip entries are verified against their CRC-32 before parsing — a
+  corrupted model archive throws `archimate-zip-crc-mismatch` instead of
+  producing garbage.
 
-The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/).
+### Security
+
+- npm package publishes with SLSA provenance and registry signature via
+  trusted publishing (OIDC).
+- CI hardened per the OWASP NPM Security Cheat Sheet: `ignore-scripts`,
+  prod-only audit gate, pinned third-party actions, weekly dependency
+  health check.
 
 ## [0.1.0] - 2026-08-15
 

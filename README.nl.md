@@ -89,10 +89,11 @@ Archi Tool-project of The Open Group.
 ## Waar dit past
 
 `archi-semantic-core` is de eerste hoeksteen van het
-Continuous-DrivenArchitecture-ecosysteem: het levert de Archi-kennisgraaf —
-een getrouw, getypt model van hoe een ontwerp in de Archi-editor is opgebouwd —
-die downstream-tools zullen gebruiken voor impactanalyse, driftdetectie en
-architectuurevolutie.
+Continuous-DrivenArchitecture-ecosysteem: een getrouwe, getypeerde semantische
+weergave van hoe een ontwerp in de Archi-editor is opgebouwd. Downstream-tools
+gebruiken die weergave voor impactanalyse, driftdetectie en
+architectuurevolutie — lagen die er bovenop een navigeerbare graaf kunnen
+bouwen, in plaats van dat dit pakket er zelf een probeert te zijn.
 
 ## Installatie
 
@@ -133,7 +134,8 @@ beide vormen kan hebben:
 
 ```ts
 import { readFileSync } from 'node:fs';
-import { extractArchiModelXml, parseArchiModel } from '@cda/archi-semantic-core';
+import { extractArchiModelXml } from '@cda/archi-semantic-core/archive';
+import { parseArchiModel } from '@cda/archi-semantic-core';
 
 const bytes = readFileSync('MyModel.archimate');
 const xml = extractArchiModelXml(bytes); // verwerkt zowel platte XML als een zip-archief
@@ -161,6 +163,10 @@ Een model kan structureel geldig zijn en toch een slechte architectuur
 weergeven.
 
 ### `extractArchiModelXml(bytes: Uint8Array): string`
+
+> Alleen Node: geëxporteerd vanuit het subpad
+> `@cda/archi-semantic-core/archive` (gebruikt `node:zlib`; de root-entrypoint
+> blijft browser-veilig).
 
 Geeft de XML-tekst van het model terug op basis van de ruwe bytes van een
 `.archimate`-bestand, ongeacht of het bestand platte XML is of Archi's
@@ -539,7 +545,8 @@ vóórdat het formaat wordt gedetecteerd, beschadigt het onherstelbaar.
 
 ```ts
 import { readFileSync } from 'node:fs';
-import { extractArchiModelXml, parseArchiModel } from '@cda/archi-semantic-core';
+import { extractArchiModelXml } from '@cda/archi-semantic-core/archive';
+import { parseArchiModel } from '@cda/archi-semantic-core';
 
 const bytes = readFileSync('MyModel.archimate'); // lees als bytes, niet als tekst
 const xml = extractArchiModelXml(bytes);

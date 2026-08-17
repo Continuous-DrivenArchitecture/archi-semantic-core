@@ -72,7 +72,7 @@
 
 ## 定位
 
-`archi-semantic-core` 是 Continuous-DrivenArchitecture 生态的第一块基石：它提供 Archi 知识图谱——忠实、类型化地呈现 Archi 编辑器中的设计构建方式——供下游工具用于影响分析、漂移检测和架构演进。
+`archi-semantic-core` 是 Continuous-DrivenArchitecture 生态的第一块基石：它忠实、类型化地呈现 Archi 编辑器中的设计构建方式。下游工具消费这一表示用于影响分析、漂移检测和架构演进——上层可以在此基础上构建可导航的图谱，而不是由本包自身充当图谱。
 
 ## 安装
 
@@ -106,7 +106,8 @@ Archi 也可以将 `.archimate` 文件保存为压缩包（zip）——只要模
 
 ```ts
 import { readFileSync } from 'node:fs';
-import { extractArchiModelXml, parseArchiModel } from '@cda/archi-semantic-core';
+import { extractArchiModelXml } from '@cda/archi-semantic-core/archive';
+import { parseArchiModel } from '@cda/archi-semantic-core';
 
 const bytes = readFileSync('MyModel.archimate');
 const xml = extractArchiModelXml(bytes); // 处理纯 XML 或压缩包（zip）两种情况
@@ -128,6 +129,8 @@ const model = parseArchiModel(xml);
 这个验证器并不是企业架构质量方面的 linter。一个模型即使结构上完全有效，也仍然可能是糟糕的架构。
 
 ### `extractArchiModelXml(bytes: Uint8Array): string`
+
+> 仅 Node：从 `@cda/archi-semantic-core/archive` 子路径导出（使用 `node:zlib`；根入口保持浏览器安全）。
 
 从 `.archimate` 文件的原始字节中返回模型的 XML 文本，无论该文件是纯 XML 还是 Archi 的压缩包（zip）变体（`model.xml` 加上每个内嵌自定义图标对应的一条 `images/` 条目，一起打包压缩——参见 [Zip 归档 `.archimate` 文件](#zip-归档-archimate-文件)）。将返回结果传给 `parseArchiModel` 即可。
 
@@ -396,7 +399,8 @@ interface ArchiRelationship {
 
 ```ts
 import { readFileSync } from 'node:fs';
-import { extractArchiModelXml, parseArchiModel } from '@cda/archi-semantic-core';
+import { extractArchiModelXml } from '@cda/archi-semantic-core/archive';
+import { parseArchiModel } from '@cda/archi-semantic-core';
 
 const bytes = readFileSync('MyModel.archimate'); // 按字节读取，而不是按文本读取
 const xml = extractArchiModelXml(bytes);

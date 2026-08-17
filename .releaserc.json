@@ -26,7 +26,7 @@
         }
       }
     ],
-    "@semantic-release/changelog",
+    ["@semantic-release/changelog", { "changelogTitle": "# Changelog" }],
     "@semantic-release/npm",
     ["@semantic-release/exec", { "prepareCmd": "npm run badges" }],
     [

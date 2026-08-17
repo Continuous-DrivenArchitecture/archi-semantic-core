@@ -1,5 +1,6 @@
 import { readFile } from 'node:fs/promises';
-import { extractArchiModelXml, parseArchiModel, type ArchiElement, type ArchiModel, type ArchiRelationship } from '../src/index.js';
+import { extractArchiModelXml } from '../src/archive.js';
+import { parseArchiModel, type ArchiElement, type ArchiModel, type ArchiRelationship } from '../src/index.js';
 
 /**
  * Reads an `.archimate` file from disk — either the plain-XML variant or

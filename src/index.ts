@@ -1,6 +1,5 @@
 export { parseArchiModel } from './parser/archi-parser.js';
 export { getLabelExpression, resolveLabelExpression } from './parser/label-expression.js';
-export { extractArchiModelXml } from './parser/zip-utils.js';
 export { validateArchiModel } from './validator/archi-validator.js';
 export type { ArchiValidationResult, ArchiValidationIssue } from './validator/archi-validator.js';
 

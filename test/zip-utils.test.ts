@@ -1,6 +1,7 @@
 import { deflateRawSync } from 'node:zlib';
 import { describe, expect, it } from 'vitest';
-import { extractArchiModelXml, parseArchiModel } from '../src/index.js';
+import { extractArchiModelXml } from '../src/archive.js';
+import { parseArchiModel } from '../src/index.js';
 
 /** CRC-32 (IEEE 802.3), matching what the zip reader itself verifies. */
 const CRC32_TABLE = (() => {
