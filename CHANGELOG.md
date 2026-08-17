@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.4.1](https://github.com/Continuous-DrivenArchitecture/archi-semantic-core/compare/v0.4.0...v0.4.1) (2026-08-17)
+
+### Bug Fixes
+
+* **release:** quote format in author guard so bash parses it ([2d8b516](https://github.com/Continuous-DrivenArchitecture/archi-semantic-core/commit/2d8b5168e036cdb3ed240234cbacf9c60127bd53))
+
 ## [0.4.0](https://github.com/Continuous-DrivenArchitecture/archi-semantic-core/compare/v0.3.1...v0.4.0) (2026-08-17)
 
 ### Features
