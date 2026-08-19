@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.4.3](https://github.com/Continuous-DrivenArchitecture/archi-semantic-core/compare/v0.4.2...v0.4.3) (2026-08-19)
+
+### Bug Fixes
+
+* **parser:** preserve sourceConnection when xsi:type is absent ([1899389](https://github.com/Continuous-DrivenArchitecture/archi-semantic-core/commit/1899389979edd9a787ecd30f9d040fcb9e0009a1))
+
+### Documentation
+
+* add Security section, fix dead docs link, sync translated READMEs ([221b512](https://github.com/Continuous-DrivenArchitecture/archi-semantic-core/commit/221b5120bfd835b623bb4dd92c17a62685cc79cf))
+
 ## [0.4.2](https://github.com/Continuous-DrivenArchitecture/archi-semantic-core/compare/v0.4.1...v0.4.2) (2026-08-17)
 
 ### Bug Fixes
