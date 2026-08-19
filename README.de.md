@@ -4,6 +4,8 @@
 
 [![English](./.github/assets/badges/lang-en.svg)](README.md) [![Deutsch](./.github/assets/badges/lang-de-active.svg)](README.de.md) [![Español](./.github/assets/badges/lang-es.svg)](README.es.md) [![Français](./.github/assets/badges/lang-fr.svg)](README.fr.md) [![Nederlands](./.github/assets/badges/lang-nl.svg)](README.nl.md) [![Português](./.github/assets/badges/lang-pt.svg)](README.pt.md) [![中文](./.github/assets/badges/lang-zh.svg)](README.zh.md)
 
+[![Documentation](https://img.shields.io/badge/documentation-CDA_Developer_Portal-blue.svg?labelColor=0B5FFF&color=0A3F9E)](https://continuous-drivenarchitecture.github.io/docs)
+
 Ein TypeScript-Parser für native `.archimate`-Modelldateien, die mit dem
 Desktop-Editor [Archi](https://www.archimatetool.com/) erstellt wurden.
 
@@ -24,6 +26,7 @@ die ZIP-Archiv-Variante des `.archimate`-Dateiformats.
 - [Wofür dieses Paket gedacht ist](#wofür-dieses-paket-gedacht-ist)
 - [Was dieses Paket nicht ist](#was-dieses-paket-nicht-ist)
 - [Wo es einzuordnen ist](#wo-es-einzuordnen-ist)
+- [Dokumentation](#dokumentation)
 - [Installation](#installation)
 - [Verwendung](#verwendung)
 - [API](#api)
@@ -50,6 +53,7 @@ die ZIP-Archiv-Variante des `.archimate`-Dateiformats.
 - [Beispiele](#beispiele)
 - [Was abgedeckt wird](#was-abgedeckt-wird)
 - [Was außerhalb des Umfangs liegt](#was-außerhalb-des-umfangs-liegt)
+- [Sicherheit](#sicherheit)
 - [Anforderungen und Modulformat](#anforderungen-und-modulformat)
 - [Entwicklung](#entwicklung)
 - [Designprinzip](#designprinzip)
@@ -96,6 +100,13 @@ Werkzeuge nutzen diese Darstellung für Wirkungsanalyse,
 Abweichungserkennung und Architekturentwicklung — Schichten, die darüber einen
 navigierbaren Graphen aufbauen können, statt dass dieses Paket selbst einer sein
 will.
+
+## Dokumentation
+
+Die vollständige Dokumentation ist im
+[CDA Developer Portal](https://continuous-drivenarchitecture.github.io/docs)
+verfügbar, einschließlich Einstiegsanleitungen, Kernkonzepten, Guides, der
+Kompatibilitätsmatrix und der generierten API-Referenz für diese Bibliothek.
 
 ## Installation
 
@@ -671,6 +682,44 @@ Sammlungen bewahren die Reihenfolge des Quell-XML.
 - Archis Sketch- und Canvas-Views als semantische `ArchiView`s. Diese
   verwenden Wurzeltypen außerhalb von `archimate:` und werden generisch
   bewahrt statt als ArchiMate-Views neu interpretiert.
+
+## Sicherheit
+
+`archi-semantic-core` parst XML — das sind die Eigenschaften, auf die sich
+ein Auditor oder Konsument verlassen kann, jeweils direkt gegen den
+mitgelieferten `fast-xml-parser`-Quellcode verifiziert, nicht aus dessen
+Dokumentation abgeleitet:
+
+- **Keine Auflösung externer Entitäten.** Eine DOCTYPE-`SYSTEM`/`PUBLIC`-
+  Deklaration einer externen Entität wird grundsätzlich abgelehnt —
+  `fast-xml-parser` wirft `"External entities are not supported"`, sobald
+  eine solche auftritt, unabhängig von der Konfiguration. Klassisches XXE
+  (lokale Dateioffenlegung, SSRF über eine Entitäts-URI) ist über die
+  Standardnutzung dieses Pakets nicht erreichbar; das ist eine Eigenschaft
+  des Parsers, nicht etwas, das `archi-semantic-core` konfiguriert oder
+  versehentlich deaktivieren könnte.
+- **Entity-Expansion ist standardmäßig begrenzt.** `fast-xml-parser` erzwingt
+  von Haus aus Standardgrenzen für Entitätsgröße, Expansionstiefe,
+  expandierte Länge und Entitätsanzahl; `archi-semantic-core` lockert oder
+  überschreibt keine davon.
+- **Eingaben werden vor dem Parsen validiert.** `parseArchiModel` führt
+  zunächst `XMLValidator.validate()` aus und wirft bei fehlerhaftem XML
+  einen Fehler, statt eine Best-Effort-Wiederherstellung zu versuchen.
+- **Keine Codeausführung aus der Eingabe.** Das Parsen erzeugt ausschließlich
+  reine Daten — Strings, Zahlen, Arrays, einfache Objekte. Nichts im
+  `.archimate`-Inhalt wird ausgewertet oder ausgeführt.
+- **Eine direkte Laufzeitabhängigkeit: `fast-xml-parser`.**
+  `archi-semantic-core` selbst fügt keine weitere eigene
+  Laufzeitabhängigkeit hinzu; alles über dieses eine Paket hinaus gehört zum
+  eigenen Abhängigkeitsbaum von `fast-xml-parser`, nicht zu diesem Paket.
+
+Dies beschreibt das strukturelle Verhalten der aktuellen Implementierung,
+keine pauschale Garantie der Schwachstellenfreiheit — Probleme auf
+Abhängigkeitsebene können weiterhin im Laufe der Zeit auftreten. Siehe
+[SECURITY.md](./SECURITY.md), um eine vermutete Schwachstelle zu melden,
+sowie den `npm audit`-Befehl bzw. die Dependabot-Warnungen dieses Repos für
+den aktuellen Advisory-Status von `fast-xml-parser` und den
+Dev-Abhängigkeiten.
 
 ## Anforderungen und Modulformat
 

@@ -4,6 +4,8 @@
 
 [![English](./.github/assets/badges/lang-en.svg)](README.md) [![Deutsch](./.github/assets/badges/lang-de.svg)](README.de.md) [![Español](./.github/assets/badges/lang-es.svg)](README.es.md) [![Français](./.github/assets/badges/lang-fr.svg)](README.fr.md) [![Nederlands](./.github/assets/badges/lang-nl-active.svg)](README.nl.md) [![Português](./.github/assets/badges/lang-pt.svg)](README.pt.md) [![中文](./.github/assets/badges/lang-zh.svg)](README.zh.md)
 
+[![Documentation](https://img.shields.io/badge/documentation-CDA_Developer_Portal-blue.svg?labelColor=0B5FFF&color=0A3F9E)](https://continuous-drivenarchitecture.github.io/docs)
+
 Een TypeScript-parser voor native `.archimate`-modelbestanden, gemaakt door de
 desktop-editor [Archi](https://www.archimatetool.com/).
 
@@ -23,6 +25,7 @@ kennen. Het leest ook de zip-archiefvariant van het `.archimate`-bestandsformaat
 - [Waarvoor dit pakket dient](#waarvoor-dit-pakket-dient)
 - [Wat dit pakket niet is](#wat-dit-pakket-niet-is)
 - [Waar dit past](#waar-dit-past)
+- [Documentatie](#documentatie)
 - [Installatie](#installatie)
 - [Gebruik](#gebruik)
 - [API](#api)
@@ -49,6 +52,7 @@ kennen. Het leest ook de zip-archiefvariant van het `.archimate`-bestandsformaat
 - [Voorbeelden](#voorbeelden)
 - [Wat wordt ondersteund](#wat-wordt-ondersteund)
 - [Wat buiten scope valt](#wat-buiten-scope-valt)
+- [Beveiliging](#beveiliging)
 - [Vereisten en moduleformaat](#vereisten-en-moduleformaat)
 - [Ontwikkeling](#ontwikkeling)
 - [Ontwerpprincipe](#ontwerpprincipe)
@@ -94,6 +98,13 @@ weergave van hoe een ontwerp in de Archi-editor is opgebouwd. Downstream-tools
 gebruiken die weergave voor impactanalyse, driftdetectie en
 architectuurevolutie — lagen die er bovenop een navigeerbare graaf kunnen
 bouwen, in plaats van dat dit pakket er zelf een probeert te zijn.
+
+## Documentatie
+
+Volledige documentatie is beschikbaar op het
+[CDA Developer Portal](https://continuous-drivenarchitecture.github.io/docs),
+inclusief starthandleidingen, kernconcepten, guides, de
+compatibiliteitsmatrix en de gegenereerde API-referentie voor deze library.
 
 ## Installatie
 
@@ -666,6 +677,43 @@ Collecties bewaren de volgorde van de bron-XML.
 - Archi Sketch- en Canvas-views als semantische `ArchiView`'s. Deze gebruiken
   root-types die niet bij `archimate:` horen en worden generiek bewaard in
   plaats van geherinterpreteerd als ArchiMate-views.
+
+## Beveiliging
+
+`archi-semantic-core` parseert XML; dit zijn de eigenschappen waarop een
+auditor of consument kan vertrouwen — elk rechtstreeks geverifieerd tegen
+de meegeleverde broncode van `fast-xml-parser`, niet afgeleid uit de
+documentatie ervan:
+
+- **Geen resolutie van externe entiteiten.** Een DOCTYPE
+  `SYSTEM`/`PUBLIC`-declaratie van een externe entiteit wordt categorisch
+  geweigerd — `fast-xml-parser` gooit `"External entities are not
+  supported"` zodra er één wordt aangetroffen, ongeacht de configuratie.
+  Klassieke XXE (lokale bestandsblootstelling, SSRF via een entiteits-URI)
+  is niet bereikbaar via het standaardgebruik van dit pakket; het is een
+  eigenschap van de parser, geen instelling die `archi-semantic-core`
+  configureert of per ongeluk zou kunnen uitschakelen.
+- **Entity-expansie is standaard begrensd.** `fast-xml-parser` hanteert
+  standaard limieten voor entiteitsgrootte, expansiediepte, geëxpandeerde
+  lengte en aantal entiteiten, meteen uit de doos; `archi-semantic-core`
+  verruimt of overschrijft geen van deze.
+- **Invoer wordt gevalideerd vóór het parseren.** `parseArchiModel` voert
+  eerst `XMLValidator.validate()` uit en gooit een fout bij misvormde XML
+  in plaats van een best-effort herstel te proberen.
+- **Geen codeuitvoering vanuit de invoer.** Parseren levert uitsluitend
+  platte data op — strings, getallen, arrays, gewone objecten. Niets in
+  `.archimate`-inhoud wordt geëvalueerd of uitgevoerd.
+- **Eén directe runtime-afhankelijkheid: `fast-xml-parser`.**
+  `archi-semantic-core` zelf voegt geen enkele andere eigen
+  runtime-afhankelijkheid toe; alles voorbij dat ene pakket behoort tot de
+  eigen afhankelijkhedenboom van `fast-xml-parser`, niet tot dit pakket.
+
+Dit beschrijft het structurele gedrag van de huidige implementatie, geen
+absolute garantie van vrij-van-kwetsbaarheden — problemen op
+afhankelijkheidsniveau kunnen na verloop van tijd nog steeds opduiken. Zie
+[SECURITY.md](./SECURITY.md) om een vermoedelijke kwetsbaarheid te melden,
+en de `npm audit` / Dependabot-meldingen van deze repo voor de actuele
+advisory-status van `fast-xml-parser` en de dev-afhankelijkheden.
 
 ## Vereisten en moduleformaat
 

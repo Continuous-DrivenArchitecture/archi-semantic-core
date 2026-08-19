@@ -4,7 +4,7 @@
 
 [![English](./.github/assets/badges/lang-en-active.svg)](README.md) [![Deutsch](./.github/assets/badges/lang-de.svg)](README.de.md) [![Español](./.github/assets/badges/lang-es.svg)](README.es.md) [![Français](./.github/assets/badges/lang-fr.svg)](README.fr.md) [![Nederlands](./.github/assets/badges/lang-nl.svg)](README.nl.md) [![Português](./.github/assets/badges/lang-pt.svg)](README.pt.md) [![中文](./.github/assets/badges/lang-zh.svg)](README.zh.md)
 
-[![Documentation](https://img.shields.io/badge/documentation-CDA_Developer_Portal-blue.svg?labelColor=0B5FFF&color=0A3F9E)](https://continuous-drivenarchitecture.github.io/developer-portal/)
+[![Documentation](https://img.shields.io/badge/documentation-CDA_Developer_Portal-blue.svg?labelColor=0B5FFF&color=0A3F9E)](https://continuous-drivenarchitecture.github.io/docs)
 
 A TypeScript parser for native `.archimate` model files created by the
 [Archi](https://www.archimatetool.com/) desktop editor.
@@ -52,6 +52,7 @@ reads the zip-archive variant of the `.archimate` file format.
 - [Examples](#examples)
 - [What's covered](#whats-covered)
 - [What's out of scope](#whats-out-of-scope)
+- [Security](#security)
 - [Requirements and module format](#requirements-and-module-format)
 - [Development](#development)
 - [Design principle](#design-principle)
@@ -97,7 +98,7 @@ navigable graph on top, instead of this package trying to be one itself.
 ## Documentation
 
 Full documentation is available in the
-[CDA Developer Portal](https://continuous-drivenarchitecture.github.io/developer-portal/),
+[CDA Developer Portal](https://continuous-drivenarchitecture.github.io/docs),
 including getting-started guides, core concepts, guides, the compatibility
 matrix, and the generated API reference for this library.
 
@@ -643,6 +644,40 @@ Collections preserve source XML order.
 - Archi Sketch and Canvas views as semantic `ArchiView`s. These use
   non-`archimate:` root types and are preserved generically rather than
   reinterpreted as ArchiMate views.
+
+## Security
+
+`archi-semantic-core` parses XML, so these are the properties an auditor or
+consumer can rely on — each verified directly against the shipped
+`fast-xml-parser` source, not inferred from its docs:
+
+- **No external entity resolution.** A DOCTYPE `SYSTEM`/`PUBLIC` external
+  entity declaration is rejected outright — `fast-xml-parser` throws
+  `"External entities are not supported"` on encountering one, regardless of
+  configuration. Classic XXE (local file disclosure, SSRF via an entity URI)
+  is not reachable through this package's default usage; it is a property of
+  the parser, not something `archi-semantic-core` configures or could
+  accidentally disable.
+- **Entity expansion is bounded by default.** `fast-xml-parser` enforces
+  default limits on entity size, expansion depth, expanded length, and
+  entity count out of the box; `archi-semantic-core` does not relax or
+  override any of them.
+- **Input is validated before parsing.** `parseArchiModel` runs
+  `XMLValidator.validate()` first and throws on malformed XML rather than
+  attempting best-effort recovery on it.
+- **No code execution from input.** Parsing only ever produces plain data —
+  strings, numbers, arrays, plain objects. Nothing in `.archimate` content is
+  evaluated or executed.
+- **One direct runtime dependency: `fast-xml-parser`.** `archi-semantic-core`
+  itself adds no further runtime dependency of its own; everything beyond
+  that single package is `fast-xml-parser`'s own dependency tree, not this
+  package's.
+
+This describes the current implementation's structural behavior, not a
+blanket vulnerability-free guarantee — dependency-level issues can still
+surface over time. See [SECURITY.md](./SECURITY.md) to report a suspected
+vulnerability, and this repo's `npm audit` / Dependabot alerts for the
+current advisory status of `fast-xml-parser` and dev dependencies.
 
 ## Requirements and module format
 

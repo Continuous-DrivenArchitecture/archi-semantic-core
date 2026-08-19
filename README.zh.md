@@ -4,6 +4,8 @@
 
 [![English](./.github/assets/badges/lang-en.svg)](README.md) [![Deutsch](./.github/assets/badges/lang-de.svg)](README.de.md) [![Español](./.github/assets/badges/lang-es.svg)](README.es.md) [![Français](./.github/assets/badges/lang-fr.svg)](README.fr.md) [![Nederlands](./.github/assets/badges/lang-nl.svg)](README.nl.md) [![Português](./.github/assets/badges/lang-pt.svg)](README.pt.md) [![中文](./.github/assets/badges/lang-zh-active.svg)](README.zh.md)
 
+[![Documentation](https://img.shields.io/badge/documentation-CDA_Developer_Portal-blue.svg?labelColor=0B5FFF&color=0A3F9E)](https://continuous-drivenarchitecture.github.io/docs)
+
 一个用于解析 [Archi](https://www.archimatetool.com/) 桌面编辑器所创建的原生 `.archimate` 模型文件的 TypeScript 解析器。
 
 `archi-semantic-core` 会读取 Archi 的原生 XML 格式，并将其转换为结构清晰、类型完善的 `ArchiModel`，其中包含文件夹、元素、关系、视图、图表对象、图表连接、便签、属性、视觉样式、Specializations/Profiles，以及在无需了解 Archi XML 结构的情况下使用该模型所需的各项原生语义细节。它同样支持读取 `.archimate` 文件格式的压缩包（zip）变体。
@@ -17,6 +19,7 @@
 - [这个包的用途](#这个包的用途)
 - [这个包不是什么](#这个包不是什么)
 - [定位](#定位)
+- [文档](#文档)
 - [安装](#安装)
 - [用法](#用法)
 - [API](#api)
@@ -43,6 +46,7 @@
 - [示例](#示例)
 - [已覆盖的内容](#已覆盖的内容)
 - [不在范围内的内容](#不在范围内的内容)
+- [安全性](#安全性)
 - [环境要求和模块格式](#环境要求和模块格式)
 - [开发](#开发)
 - [设计原则](#设计原则)
@@ -73,6 +77,10 @@
 ## 定位
 
 `archi-semantic-core` 是 Continuous-DrivenArchitecture 生态的第一块基石：它忠实、类型化地呈现 Archi 编辑器中的设计构建方式。下游工具消费这一表示用于影响分析、漂移检测和架构演进——上层可以在此基础上构建可导航的图谱，而不是由本包自身充当图谱。
+
+## 文档
+
+完整文档可在 [CDA Developer Portal](https://continuous-drivenarchitecture.github.io/docs) 获取，包括入门指南、核心概念、各类指南、兼容性矩阵，以及为本库生成的 API 参考文档。
 
 ## 安装
 
@@ -470,6 +478,18 @@ const model = parseArchiModel(xml);
 - 从压缩包（zip）格式的 `.archimate` 文件中提取内嵌图片的*字节数据*——只会保留 `imagePath` 这个引用字符串。
 - Label Expressions 的"Reference Prefix"形式（`$parent{...}`、`$source{...}`、`$model{...}`、`$<relationship>:source{...}` 等），因为它们需要遍历模型图，而不是只读取单个对象。`${specialization}` 和 `${viewpoint}` 占位符同样不会被求值。
 - 将 Archi 的 Sketch 和 Canvas 视图当作语义化的 `ArchiView`。这些视图使用的是非 `archimate:` 的根类型，会以通用方式保留，而不会被重新解释为 ArchiMate 视图。
+
+## 安全性
+
+`archi-semantic-core` 解析 XML，以下是审计者或使用者可以依赖的属性——每一条都是直接对照 `fast-xml-parser` 实际发布的源代码验证过的，而不是从其文档推断出来的：
+
+- **不解析外部实体。** DOCTYPE 中的 `SYSTEM`/`PUBLIC` 外部实体声明会被直接拒绝——一旦遇到，`fast-xml-parser` 就会抛出 `"External entities are not supported"`，与配置无关。经典的 XXE（本地文件泄露、通过实体 URI 发起 SSRF）在本包的默认用法下不可达；这是解析器本身的特性，不是 `archi-semantic-core` 配置的、也不可能被意外关闭的东西。
+- **实体展开默认有上限。** `fast-xml-parser` 开箱即用地对实体大小、展开深度、展开后长度和实体数量设有默认限制；`archi-semantic-core` 不会放宽或覆盖其中任何一项。
+- **解析前会先校验输入。** `parseArchiModel` 会先运行 `XMLValidator.validate()`，遇到格式错误的 XML 会直接抛出异常，而不会尝试"尽力而为"式的恢复。
+- **不会从输入中执行代码。** 解析只会产出纯数据——字符串、数字、数组、普通对象。`.archimate` 内容中的任何东西都不会被求值或执行。
+- **只有一个直接的运行时依赖：`fast-xml-parser`。** `archi-semantic-core` 本身不再添加任何其他运行时依赖；除了这一个包之外的部分，都属于 `fast-xml-parser` 自己的依赖树，与本包无关。
+
+这里描述的是当前实现的结构性行为，而不是"绝无漏洞"的笼统保证——依赖层面的问题仍可能随时间出现。如需报告疑似漏洞，请参见 [SECURITY.md](./SECURITY.md)；如需了解 `fast-xml-parser` 及开发依赖当前的公告状态，请参见本仓库的 `npm audit` 结果 / Dependabot 提醒。
 
 ## 环境要求和模块格式
 

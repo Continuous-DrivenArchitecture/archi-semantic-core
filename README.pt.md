@@ -4,6 +4,8 @@
 
 [![English](./.github/assets/badges/lang-en.svg)](README.md) [![Deutsch](./.github/assets/badges/lang-de.svg)](README.de.md) [![Español](./.github/assets/badges/lang-es.svg)](README.es.md) [![Français](./.github/assets/badges/lang-fr.svg)](README.fr.md) [![Nederlands](./.github/assets/badges/lang-nl.svg)](README.nl.md) [![Português](./.github/assets/badges/lang-pt-active.svg)](README.pt.md) [![中文](./.github/assets/badges/lang-zh.svg)](README.zh.md)
 
+[![Documentation](https://img.shields.io/badge/documentation-CDA_Developer_Portal-blue.svg?labelColor=0B5FFF&color=0A3F9E)](https://continuous-drivenarchitecture.github.io/docs)
+
 Um parser em TypeScript para arquivos de modelo `.archimate` nativos criados
 pelo editor de desktop [Archi](https://www.archimatetool.com/).
 
@@ -24,6 +26,7 @@ formato `.archimate`.
 - [Para que serve este pacote](#para-que-serve-este-pacote)
 - [O que isto NÃO é](#o-que-isto-não-é)
 - [Onde isso se encaixa](#onde-isso-se-encaixa)
+- [Documentação](#documentação)
 - [Instalação](#instalação)
 - [Uso](#uso)
 - [API](#api)
@@ -50,6 +53,7 @@ formato `.archimate`.
 - [Exemplos](#exemplos)
 - [O que é coberto](#o-que-é-coberto)
 - [O que está fora do escopo](#o-que-está-fora-do-escopo)
+- [Segurança](#segurança)
 - [Requisitos e formato de módulo](#requisitos-e-formato-de-módulo)
 - [Desenvolvimento](#desenvolvimento)
 - [Princípio de design](#princípio-de-design)
@@ -92,6 +96,13 @@ um design é construído no editor Archi. As ferramentas posteriores consomem es
 representação para análise de impacto, detecção de deriva
 e evolução da arquitetura — camadas que podem construir um grafo navegável por
 cima, em vez de este pacote tentar ser um ele próprio.
+
+## Documentação
+
+A documentação completa está disponível no
+[CDA Developer Portal](https://continuous-drivenarchitecture.github.io/docs),
+incluindo guias de início, conceitos centrais, guias, a matriz de
+compatibilidade e a referência de API gerada para esta biblioteca.
 
 ## Instalação
 
@@ -666,6 +677,43 @@ As coleções preservam a ordem do XML de origem.
 - Vistas Sketch e Canvas do Archi como `ArchiView`s semânticas. Elas usam
   tipos raiz que não são `archimate:` e são preservadas de forma genérica,
   em vez de reinterpretadas como vistas ArchiMate.
+
+## Segurança
+
+`archi-semantic-core` faz parsing de XML, então estas são as propriedades
+em que um auditor ou consumidor pode confiar — cada uma verificada
+diretamente no código-fonte distribuído do `fast-xml-parser`, não inferida
+da documentação dele:
+
+- **Sem resolução de entidades externas.** Uma declaração de entidade
+  externa DOCTYPE `SYSTEM`/`PUBLIC` é rejeitada de imediato — o
+  `fast-xml-parser` lança `"External entities are not supported"` ao
+  encontrar uma, independentemente da configuração. O XXE clássico
+  (divulgação de arquivo local, SSRF via uma URI de entidade) não é
+  alcançável através do uso padrão deste pacote; é uma propriedade do
+  parser, não algo que o `archi-semantic-core` configure ou possa
+  desativar acidentalmente.
+- **A expansão de entidades é limitada por padrão.** O `fast-xml-parser`
+  aplica limites padrão de tamanho de entidade, profundidade de expansão,
+  comprimento expandido e contagem de entidades logo de início; o
+  `archi-semantic-core` não relaxa nem sobrescreve nenhum deles.
+- **A entrada é validada antes do parsing.** `parseArchiModel` executa
+  `XMLValidator.validate()` primeiro e lança uma exceção em XML malformado,
+  em vez de tentar uma recuperação best-effort.
+- **Sem execução de código a partir da entrada.** O parsing produz apenas
+  dados simples — strings, números, arrays, objetos simples. Nada no
+  conteúdo `.archimate` é avaliado ou executado.
+- **Uma única dependência de runtime direta: `fast-xml-parser`.** O próprio
+  `archi-semantic-core` não adiciona nenhuma outra dependência de runtime
+  própria; tudo além desse único pacote pertence à árvore de dependências
+  do próprio `fast-xml-parser`, não deste pacote.
+
+Isto descreve o comportamento estrutural da implementação atual, não uma
+garantia absoluta de ausência de vulnerabilidades — problemas em nível de
+dependência ainda podem surgir com o tempo. Veja [SECURITY.md](./SECURITY.md)
+para reportar uma vulnerabilidade suspeita, e o `npm audit` / os alertas do
+Dependabot deste repositório para o status atual de advisories do
+`fast-xml-parser` e das dependências de desenvolvimento.
 
 ## Requisitos e formato de módulo
 

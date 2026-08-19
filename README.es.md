@@ -4,6 +4,7 @@
 
 [![English](./.github/assets/badges/lang-en.svg)](README.md) [![Deutsch](./.github/assets/badges/lang-de.svg)](README.de.md) [![Español](./.github/assets/badges/lang-es-active.svg)](README.es.md) [![Français](./.github/assets/badges/lang-fr.svg)](README.fr.md) [![Nederlands](./.github/assets/badges/lang-nl.svg)](README.nl.md) [![Português](./.github/assets/badges/lang-pt.svg)](README.pt.md) [![中文](./.github/assets/badges/lang-zh.svg)](README.zh.md)
 
+[![Documentation](https://img.shields.io/badge/documentation-CDA_Developer_Portal-blue.svg?labelColor=0B5FFF&color=0A3F9E)](https://continuous-drivenarchitecture.github.io/docs)
 
 Un parser de TypeScript para archivos de modelo `.archimate` nativos creados
 por el editor de escritorio [Archi](https://www.archimatetool.com/).
@@ -24,6 +25,7 @@ de Archi. También lee la variante comprimida (zip) del formato `.archimate`.
 - [Para qué sirve este paquete](#para-qué-sirve-este-paquete)
 - [Qué NO es este paquete](#qué-no-es-este-paquete)
 - [Dónde encaja](#dónde-encaja)
+- [Documentación](#documentación)
 - [Instalación](#instalación)
 - [Uso](#uso)
 - [API](#api)
@@ -50,6 +52,7 @@ de Archi. También lee la variante comprimida (zip) del formato `.archimate`.
 - [Ejemplos](#ejemplos)
 - [Qué cubre](#qué-cubre)
 - [Qué queda fuera del alcance](#qué-queda-fuera-del-alcance)
+- [Seguridad](#seguridad)
 - [Requisitos y formato de módulo](#requisitos-y-formato-de-módulo)
 - [Desarrollo](#desarrollo)
 - [Principio de diseño](#principio-de-diseño)
@@ -92,6 +95,13 @@ se construye un diseño en el editor Archi. Las herramientas posteriores consume
 esa representación para análisis de impacto,
 detección de deriva y evolución de la arquitectura — capas que pueden construir
 un grafo navegable encima, en lugar de que este paquete intente ser uno mismo.
+
+## Documentación
+
+La documentación completa está disponible en el
+[CDA Developer Portal](https://continuous-drivenarchitecture.github.io/docs),
+incluyendo guías de inicio, conceptos centrales, guías, la matriz de
+compatibilidad y la referencia de API generada para esta librería.
 
 ## Instalación
 
@@ -658,6 +668,42 @@ Las colecciones preservan el orden del XML fuente.
 - Vistas Sketch y Canvas como `ArchiView` semánticas. Utilizan tipos raíz que
   no pertenecen al namespace `archimate:` y se conservan de forma genérica en
   lugar de reinterpretarse como vistas ArchiMate.
+
+## Seguridad
+
+`archi-semantic-core` parsea XML, así que estas son las propiedades en las
+que un auditor o consumidor puede confiar — cada una verificada
+directamente contra el código fuente de `fast-xml-parser` tal como se
+distribuye, no inferida de su documentación:
+
+- **Sin resolución de entidades externas.** Una declaración de entidad
+  externa DOCTYPE `SYSTEM`/`PUBLIC` se rechaza de plano — `fast-xml-parser`
+  lanza `"External entities are not supported"` al encontrar una, sin
+  importar la configuración. El XXE clásico (divulgación de archivos
+  locales, SSRF vía una URI de entidad) no es alcanzable a través del uso
+  por defecto de este paquete; es una propiedad del parser, no algo que
+  `archi-semantic-core` configure ni pueda desactivar por accidente.
+- **La expansión de entidades está acotada por defecto.** `fast-xml-parser`
+  aplica límites por defecto sobre tamaño de entidad, profundidad de
+  expansión, longitud expandida y cantidad de entidades desde el primer
+  momento; `archi-semantic-core` no relaja ni sobreescribe ninguno de ellos.
+- **El input se valida antes de parsear.** `parseArchiModel` ejecuta primero
+  `XMLValidator.validate()` y lanza una excepción ante XML mal formado, en
+  vez de intentar una recuperación best-effort.
+- **Sin ejecución de código a partir del input.** El parseo solo produce
+  datos planos — strings, números, arrays, objetos simples. Nada del
+  contenido `.archimate` se evalúa ni se ejecuta.
+- **Una sola dependencia de runtime directa: `fast-xml-parser`.**
+  `archi-semantic-core` en sí no agrega ninguna otra dependencia de runtime
+  propia; todo lo que hay más allá de ese único paquete pertenece al árbol
+  de dependencias propio de `fast-xml-parser`, no de este paquete.
+
+Esto describe el comportamiento estructural de la implementación actual, no
+una garantía absoluta de ausencia de vulnerabilidades — pueden seguir
+surgiendo problemas a nivel de dependencias con el tiempo. Ver
+[SECURITY.md](./SECURITY.md) para reportar una vulnerabilidad sospechada, y
+el `npm audit` / las alertas de Dependabot de este repo para el estado de
+advisories vigente de `fast-xml-parser` y las dependencias de desarrollo.
 
 ## Requisitos y formato de módulo
 
