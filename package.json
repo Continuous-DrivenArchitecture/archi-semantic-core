@@ -1,6 +1,6 @@
 {
   "name": "@cda/archi-semantic-core",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "description": "The foundational semantic core of the Continuous-Driven Architecture (CDA) ecosystem. Translates native Archi files into a faithful, typed semantic representation ready for automated governance and GitOps pipelines.",
   "keywords": [
     "archimate",
