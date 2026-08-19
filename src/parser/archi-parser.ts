@@ -23,7 +23,6 @@ import { extractStyle } from './style-utils.js';
 const VIEW_TYPE_PATTERN = /ArchimateDiagramModel$/i;
 const RELATIONSHIP_TYPE_PATTERN = /Relationship$/i;
 const NOTE_TYPE_PATTERN = /Note$/i;
-const CONNECTION_TYPE_PATTERN = /Connection$/i;
 const DIAGRAM_MODEL_REFERENCE_TYPE_PATTERN = /DiagramModelReference$/i;
 
 /**
@@ -195,14 +194,19 @@ export function parseArchiModel(xmlText: string): ArchiModel {
     return deriveSemanticType(xsiType, namespacePrefix);
   }
 
-  /** Records this node's own `sourceConnection` children (its visual outgoing connections). */
+  /**
+   * Records this node's own `sourceConnection` children (its visual outgoing
+   * connections). Every `sourceConnection` is preserved regardless of its
+   * `xsi:type` — the tag itself, not the attribute, is what identifies it as
+   * a connection. Some purely visual connections (e.g. a link between two
+   * `DiagramModelReference`s) omit `xsi:type` entirely; that is read as
+   * `null` rather than dropping the connection or fabricating a value.
+   */
   function walkConnections(containerNode: XmlNode, viewId: string): void {
     for (const conn of asArray(containerNode.sourceConnection) as XmlNode[]) {
-      const xsiType = text(attr(conn, 'xsi:type'));
-      if (!xsiType || !CONNECTION_TYPE_PATTERN.test(xsiType)) continue;
       diagramConnections.push({
         id: text(attr(conn, 'id')),
-        xsiType,
+        xsiType: readOptionalText(attr(conn, 'xsi:type')),
         viewId,
         sourceId: text(attr(conn, 'source')),
         targetId: text(attr(conn, 'target')),

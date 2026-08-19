@@ -53,5 +53,5 @@ export function viewLabels(model: ArchiModel, viewId: string): ViewLabel[] {
 function defaultLabel(node: VisualNode): string {
   if ('content' in node) return node.content ?? '';
   if ('name' in node && node.name !== null && node.name !== '') return node.name;
-  return node.xsiType.replace(/^.*:/, '');
+  return node.xsiType?.replace(/^.*:/, '') ?? '';
 }

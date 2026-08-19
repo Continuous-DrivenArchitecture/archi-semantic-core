@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<archimate:model xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:archimate="http://www.archimatetool.com/archimate" name="ViewReference" id="model-view-reference" version="5.0.0">
+  <folder name="Views" id="folder-views" type="diagrams">
+    <element xsi:type="archimate:ArchimateDiagramModel" name="Referenced View A" id="view-a"/>
+    <element xsi:type="archimate:ArchimateDiagramModel" name="Referenced View B" id="view-b"/>
+    <element xsi:type="archimate:ArchimateDiagramModel" name="Main View" id="view-main">
+      <child xsi:type="archimate:DiagramModelReference" id="vis-ref-a" textPosition="1" model="view-a">
+        <sourceConnection id="conn-untyped" source="vis-ref-a" target="vis-ref-b"/>
+      </child>
+      <child xsi:type="archimate:DiagramModelReference" id="vis-ref-b" textPosition="1" model="view-b" targetConnections="conn-untyped"/>
+    </element>
+  </folder>
+</archimate:model>
