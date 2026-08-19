@@ -200,6 +200,24 @@ describe('parseArchiModel — views, diagram objects, nested objects, connection
   });
 });
 
+describe('parseArchiModel — untyped sourceConnection between view references (bug fix: silently dropped)', () => {
+  const model = parseArchiModel(loadFixture('diagram-view-reference.archimate'));
+
+  it('preserves a sourceConnection with no xsi:type instead of dropping it', () => {
+    const connection = model.diagramConnections.find((conn) => conn.id === 'conn-untyped')!;
+    expect(connection).toBeDefined();
+    expect(connection.xsiType).toBeNull();
+    expect(connection.sourceId).toBe('vis-ref-a');
+    expect(connection.targetId).toBe('vis-ref-b');
+    expect(connection.archimateRelationshipId).toBeNull();
+  });
+
+  it('still links the connection into its source object\'s connectionIds', () => {
+    const refA = model.diagramObjects.find((obj) => obj.id === 'vis-ref-a')!;
+    expect(refA.connectionIds).toEqual(['conn-untyped']);
+  });
+});
+
 describe('parseArchiModel — documentation, properties, and Group containers', () => {
   const model = parseArchiModel(loadFixture('object-details.archimate'));
 

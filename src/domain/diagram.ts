@@ -131,8 +131,12 @@ export interface ArchiDiagramObject {
  */
 export interface ArchiDiagramConnection {
   id: string;
-  /** Verbatim `xsi:type` attribute, e.g. "archimate:Connection". */
-  xsiType: string;
+  /**
+   * Verbatim `xsi:type` attribute, e.g. "archimate:Connection". `null` when
+   * absent — Archi emits some purely visual connections (e.g. a link between
+   * two `DiagramModelReference`s) without one. Never fabricated.
+   */
+  xsiType: string | null;
   viewId: string;
   /** Id of the source ArchiDiagramObject — a VISUAL id, not a semantic element id. */
   sourceId: string;

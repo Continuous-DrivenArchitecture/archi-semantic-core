@@ -64,7 +64,8 @@ const EMPTY_CONTEXT: LabelExpressionContext = {
   properties: [],
 };
 
-function stripNamespacePrefix(xsiType: string): string {
+function stripNamespacePrefix(xsiType: string | null): string | null {
+  if (xsiType === null) return null;
   const index = xsiType.indexOf(':');
   return index >= 0 ? xsiType.slice(index + 1) : xsiType;
 }
