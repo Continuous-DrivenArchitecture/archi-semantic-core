@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.4.2](https://github.com/Continuous-DrivenArchitecture/archi-semantic-core/compare/v0.4.1...v0.4.2) (2026-08-17)
+
+### Bug Fixes
+
+* **release:** prevent publishing packages without dist ([b8ab8a0](https://github.com/Continuous-DrivenArchitecture/archi-semantic-core/commit/b8ab8a00a90b41ce915f2312bfd9df2390923106))
+
+### Documentation
+
+* add documentation website (Astro/Starlight) with generated API reference ([02d3268](https://github.com/Continuous-DrivenArchitecture/archi-semantic-core/commit/02d326836c91c96dc532c9d4cc13f9ac52193ab2))
+* temporarily serve GitHub Pages from develop ([9b44f61](https://github.com/Continuous-DrivenArchitecture/archi-semantic-core/commit/9b44f6154c1230c9655dbd8f02e7d2bb48495a36))
+
+### Miscellaneous Chores
+
+* **docs:** retire in-repo website in favor of the CDA Developer Portal ([b267e88](https://github.com/Continuous-DrivenArchitecture/archi-semantic-core/commit/b267e881e0628931ee45385d55e84adbf8f86582))
+
+### Continuous Integration
+
+* **docs:** install root dependencies so typedoc can resolve source imports ([52d03db](https://github.com/Continuous-DrivenArchitecture/archi-semantic-core/commit/52d03db277e873dcd8d0a799db30a9edf87b2a99))
+
 ## [0.4.1](https://github.com/Continuous-DrivenArchitecture/archi-semantic-core/compare/v0.4.0...v0.4.1) (2026-08-17)
 
 ### Bug Fixes
