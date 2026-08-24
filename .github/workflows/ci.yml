@@ -1,4 +1,5 @@
 name: CI
+# CDA Phase 5 verification: re-checked 2026-08-23 under allowed_actions=selected, sha_pinning_required=true, ruleset ci-required + strict.
 
 on:
   pull_request:
