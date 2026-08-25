@@ -1,5 +1,7 @@
 export { parseArchiModel } from './parser/archi-parser.js';
 export { getLabelExpression, resolveLabelExpression } from './parser/label-expression.js';
+export { resolveAbsoluteBounds } from './parser/geometry.js';
+export type { ArchiResolvedBounds } from './parser/geometry.js';
 export { validateArchiModel } from './validator/archi-validator.js';
 export type { ArchiValidationResult, ArchiValidationIssue } from './validator/archi-validator.js';
 
