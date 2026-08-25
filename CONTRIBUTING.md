@@ -143,18 +143,18 @@ the other Continuous-DrivenArchitecture repos.
 
 ## Branching strategy
 
-- **`main`** is the release branch: semantic-release publishes from it
-  (`.releaserc.json` -> `branches: ["main"]`) and it is protected by the
-  GitHub ruleset — nothing reaches it without a reviewed PR, except the
-  release workflow's own `chore(release)` push (bypassed for the
-  `cda-release-sentinel` app).
-- **`develop`** is the integration branch: commit freely, push freely,
-  CI runs on every push. When the work is ready to ship, open a PR
-  `develop -> main` and let the ruleset + CI decide.
-- Nothing is ever published to npm from `develop`; only `main` releases.
-- After each release on `main`, sync `develop` so it keeps the
-  `chore(release)` commits and the regenerated badges:
-  `git checkout develop && git merge main && git push origin develop`.
+- **`main`** is the only permanent branch: semantic-release publishes from
+  it (`.releaserc.json` -> `branches: ["main"]`) and it is protected by the
+  GitHub ruleset — nothing reaches it without a reviewed, squash-merged PR.
+  Main is never pushed to directly, including by the release workflow: no
+  release commit is ever written back to it.
+- Work happens on short-lived branches (`feature/*`, `fix/*`, `chore/*`,
+  `docs/*`, `refactor/*`, ...) opened directly from `main` and merged back
+  into `main` via PR.
+- A release is produced by `semantic-release` running against the exact
+  reviewed commit that landed on `main` — it computes the next version, tags
+  it, publishes to npm via Trusted Publishing (OIDC, no long-lived token),
+  and creates the GitHub Release, all without mutating `main`'s history.
 
 ## Commits and pull requests
 
@@ -168,9 +168,11 @@ the other Continuous-DrivenArchitecture repos.
   `actions/foo@<40-char-sha>`.
 - Describe *why* the change is needed, not just what changed — especially
   for a new native attribute, cite what you checked in Archi's source.
-- Don't bump the version in `package.json` or edit `CHANGELOG.md` — both
-  are handled automatically at release time by semantic-release
-  (`.releaserc.json`); every release is a tag-triggered push to `main`.
+- Don't bump the version in `package.json` — `semantic-release` computes it
+  at release time and uses it to tag and publish; the value committed in
+  `package.json` on `main` is not updated (no commit is ever pushed back to
+  `main` during release). The GitHub Release notes are the changelog of
+  record; `CHANGELOG.md` is no longer generated or updated automatically.
 
 ## Runbooks
 
@@ -180,7 +182,7 @@ action it performs (imperative, kebab-case):
 
 | Runbook | Description |
 |---|---|
-| [`create-new-repo.md`](runbooks/create-new-repo.md) / [`create-new-repo.es.md`](runbooks/create-new-repo.es.md) | Stand up a new library repository end-to-end: sentinel GitHub App, main ruleset, OIDC publishing, pinned actions, first release verification |
+| [`create-new-repo.md`](runbooks/create-new-repo.md) / [`create-new-repo.es.md`](runbooks/create-new-repo.es.md) | Stand up a new library repository end-to-end: main ruleset, OIDC publishing, pinned actions, first release verification |
 
 Add a new runbook to `runbooks/` (with its `.es.md` translation when
 relevant) and to this table when one lands.

@@ -18,23 +18,19 @@ con releases automáticos, gobernanza de identidad y `main` protegido.
 ## Fase 1 — En GitHub (UI, una vez por repo)
 
 1. **Crear el repo** en la org, público, default branch `main`, **sin README** (evita el commit inicial del bot).
-2. **El sentinel** (una vez por org, se reutiliza en todos los repos): tu cuenta/org → Developer settings → GitHub Apps → New:
-   - Nombre: `cda-release-sentinel` · Homepage: `https://github.com/Continuous-DrivenArchitecture/<repo>`
-   - Permissions → Repository → **Contents: Read and write** (todo lo demás en default)
-   - **Sin webhook, sin eventos, sin OAuth** (Callback URL vacío)
-   - *Only on this account* · Guardar **App ID** + **private key** (`.pem`, se descarga una sola vez)
-3. **Instalar la app** en el repo nuevo.
-4. **Secrets del repo** (Settings → Secrets and variables → Actions):
-   - `RELEASE_APP_ID` → el número
-   - `RELEASE_APP_PRIVATE_KEY` → contenido completo del `.pem` (líneas BEGIN/END incluidas)
-   - Nada más: npm publica por **OIDC**, sin tokens
-5. **Ruleset sobre `main`** (Settings → Rules → Rulesets → New branch ruleset):
-   - Target: `main` · Bypass list: **solo la app sentinel**
+2. **Secrets del repo**: ninguno es necesario — npm publica por **OIDC**
+   (Trusted Publishing) y el workflow de release usa el `GITHUB_TOKEN`
+   ordinario y efímero. Sin GitHub App, sin credencial de larga duración
+   que aprovisionar.
+3. **Ruleset sobre `main`** (Settings → Rules → Rulesets → New branch ruleset):
+   - Target: `main` · Bypass list: **vacío** (ninguna identidad necesita
+     pushear directo a `main`, tampoco la automatización de release)
    - ✅ Require a pull request before merging (1 approval)
-   - ✅ Require status checks: `validate`, `audit`, `sbom`
-   - ✅ Block force pushes
-6. **Dependabot**: `.github/dependabot.yml` (version updates) + Settings → Code security → **enable alerts y security updates** (esto es manual, no va por archivo).
-7. **npm trusted publishing** (cuando el paquete exista publicado): npmjs.com → Settings del paquete → "Publish from GitHub Actions" → agregar `Continuous-DrivenArchitecture/<repo>`. Revocar tokens viejos y activar 2FA obligatoria en la cuenta npm.
+   - ✅ Require status checks: `ci-required` (un único job estable,
+     independiente de la matriz — ver Fase 2 paso 4)
+   - ✅ Block force pushes · ✅ Block branch deletion
+4. **Dependabot**: `.github/dependabot.yml` (version updates) + Settings → Code security → **enable alerts y security updates** (esto es manual, no va por archivo).
+5. **npm trusted publishing** (cuando el paquete exista publicado): npmjs.com → Settings del paquete → "Publish from GitHub Actions" → agregar `Continuous-DrivenArchitecture/<repo>`. Revocar tokens viejos y activar 2FA obligatoria en la cuenta npm.
 
 ## Fase 2 — En local
 
@@ -47,48 +43,67 @@ con releases automáticos, gobernanza de identidad y `main` protegido.
      "plugins": [
        "@semantic-release/commit-analyzer",
        "@semantic-release/release-notes-generator",
-       ["@semantic-release/changelog", { "changelogFile": "CHANGELOG.md" }],
        ["@semantic-release/npm", { "provenance": true }],
-       ["@semantic-release/git", {
-         "assets": ["package.json", "package-lock.json", "CHANGELOG.md", "README*.md", ".github/assets/badges"],
-         "message": "chore(release): ${nextRelease.version} [skip ci]"
-       }],
        "@semantic-release/github"
      ]
    }
    ```
+   Sin `@semantic-release/git` ni `@semantic-release/changelog`: nunca se
+   commitea nada de vuelta a `main` durante un release (CDA Model B). Las
+   notas del GitHub Release son el changelog de referencia.
 4. **Workflows** (`.github/workflows/`), con **toda acción pineada a SHA** (nunca tags flotantes):
-   - `ci.yml`: `on: pull_request` + `push` (todos los branches). Jobs: `validate` (npm ci, typecheck, build, test, `npm run badges`), `audit` (`npm audit --omit=dev --audit-level=high`), `sbom` (npm sbom → upload artifact).
-   - `release.yml`: `on: push` a `main`. Mintear token del sentinel con `actions/create-github-app-token@<sha>` (secrets `RELEASE_APP_ID`/`RELEASE_APP_PRIVATE_KEY`), pasarlo a `actions/checkout` y a semantic-release como `GITHUB_TOKEN`. Fijar la **identidad humana** del commit: `GIT_AUTHOR_NAME`/`GIT_AUTHOR_EMAIL`/`GIT_COMMITTER_*` = mantenedor (no bot). `permissions: contents: write, issues: write, pull-requests: write, id-token: write`.
+   - `ci.yml`: `on: pull_request` + `push` (todos los branches). Jobs:
+     `validate` (npm ci, typecheck, build, test), `audit`
+     (`npm audit --omit=dev --audit-level=high`), `sbom` (npm sbom →
+     upload artifact), más un job estable **`ci-required`**
+     (`needs: [validate, audit, sbom]`, `if: always()`, falla salvo que
+     el `.result` de cada job necesario sea `success`) — es el único
+     nombre de job que exige el ruleset de `main`, así que agregar/quitar
+     una versión de Node en la matriz de `validate` nunca toca el ruleset.
+   - `release.yml`: `on: push` a `main`. `actions/checkout` ordinario +
+     `semantic-release`, usando `secrets.GITHUB_TOKEN` directo — sin App,
+     sin installation token, sin identidad de bypass, porque no se pushea
+     nada de vuelta a `main`. `permissions: contents: write, id-token: write`
+     (agregar `issues`/`pull-requests: write` solo si el comportamiento de
+     comentarios en issues/PRs de `@semantic-release/github` realmente
+     hace falta).
    - `dependency-health.yml`: scorecard / auditoría de dependencias (como en `archi-semantic-core`).
    - Resolver SHA de una acción: `https://api.github.com/repos/<owner>/<action>/releases/latest` → `target_commitish` (o por tag vía API).
-5. **`.github/dependabot.yml`**: `github-actions` + `npm`, semanal, `open-pull-requests-limit: 3`.
-6. **`CONTRIBUTING.md`**: Conventional Commits, no tocar `package.json`/`CHANGELOG.md` a mano, regla del SHA, estrategia de ramas (develop/main, sync post-release).
-7. **README** (7 idiomas) + `.github/assets/badges` (el script `scripts/generate-badges.mjs` regenera badges y el cache-busting `?v=` de los README; se actualizan solos en el CI del commit de release). `docs/` queda reservado para el futuro sitio público Starlight (separado de las recetas de `.github/`).
-8. **Ramas**: `git checkout -b develop` — el trabajo vive ahí; `main` solo recibe PRs.
+5. **`.github/dependabot.yml`**: `github-actions` + `npm`, semanal,
+   `open-pull-requests-limit: 3`. Omitir `target-branch` — usa por defecto
+   el branch por defecto del repo (`main`).
+6. **`CONTRIBUTING.md`**: Conventional Commits, no tocar `package.json` a
+   mano, regla del SHA, ramas solo-main (branches de vida corta
+   `feature/*`, `fix/*`, `chore/*`, ... squash-mergeados a `main`).
+7. **README** (7 idiomas) + `.github/assets/badges`. El script
+   `scripts/generate-badges.mjs` regenera los SVG, pero bajo Model B nada
+   commitea los archivos regenerados de vuelta al repo (no hay commit de
+   release) — los badges se refrescan a mano (re-ejecutar el script y
+   commitear) cuando quedan desactualizados, no automáticamente en cada
+   release. `docs/` queda reservado para el futuro sitio público Starlight
+   (separado de las recetas de `.github/`).
+8. **Ramas**: trabajar directo en branches de vida corta a partir de
+   `main`; `main` solo recibe PRs.
 
 ## Fase 3 — Verificación del primer release
 
-1. `git push -u origin develop` → CI verde en develop.
-2. PR `develop → main` (primer commit: `chore(init)` o `docs:`) → merge (te exige CI por el ruleset).
-3. El merge dispara el release 0.1.0. Verificar:
-   - Commit `chore(release): 0.1.0` **autor = humano**, tag `v0.1.0` apuntando a main
+1. Abrir un PR desde un branch de vida corta (primer commit: `chore(init)`
+   o `docs:`) hacia `main` → merge (el ruleset exige `ci-required`).
+2. El merge dispara el release 0.1.0. Verificar:
+   - Tag `v0.1.0` apuntando al commit mergeado en `main` (no se agregó
+     ningún commit extra)
    - npm 0.1.0 publicado con **provenance** (OIDC, sin token)
    - GitHub Release con notas generadas
-   - Contributor graph: solo humanos
-4. Sync: `git checkout develop && git merge main && git push origin develop`.
 
 ## Fase 4 — Mantenimiento
 
 - Mergear PRs de Dependabot tras revisar (cuidado con los **majors**, v4→v7 cambia compat).
-- Cada release es automático: versión, CHANGELOG, badges, npm, GitHub Release.
-- Tras cada release: sync de `develop` (Fase 3, paso 4).
+- Cada release es automático: versión, npm, GitHub Release. `package.json`
+  en `main` y `CHANGELOG.md` no los toca el release en sí.
 - Regla de oro: **jamás reutilizar un tag o versión fallida** — subir de versión.
 
 ## Trampas conocidas (lecciones de `archi-semantic-core`)
 
-- **No existe "GitHub Actions" en el bypass list** del ruleset, y el `GITHUB_TOKEN` **no puede** bypasear rulesets (GH006/GH013): el push del `chore(release)` falla a menos que uses una GitHub App como bypass actor. Es el motivo del sentinel.
-- El push del sentinel **sí dispara workflows** (a diferencia del GITHUB_TOKEN): el `[skip ci]` en el mensaje del release evita recursión.
 - **No borrar `NPM_TOKEN`** antes de enrolar trusted publishing en npmjs.com, o el próximo release falla al publicar.
 - Si semantic-release publica sin tag/commit (versión duplicada por historia huérfana): apuntar el tag a main y **recrear la release manualmente** para que el autor sea el humano.
 - El bot puede dejar `refs/notes/semantic-release-*` que ensucian el gráfico de contribuidores: borrarlas con `git push origin --delete refs/notes/<ref>`.

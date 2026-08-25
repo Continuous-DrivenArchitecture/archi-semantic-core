@@ -1,4 +1,6 @@
 name: CI
+# CDA Phase 6: re-verified 2026-08-24 after Protect main bypass-actor removal (sentinel no longer a bypass actor).
+# CDA Phase 5 verification: re-checked 2026-08-23 under allowed_actions=selected, sha_pinning_required=true, ruleset ci-required + strict.
 
 on:
   pull_request:
@@ -63,3 +65,29 @@ jobs:
           name: sbom
           path: sbom.spdx.json
           if-no-files-found: error
+
+  # Stable, matrix-independent required status check (CDA npm Library
+  # Profile v1): the Protect main ruleset targets ONLY this job's name.
+  # Adding/removing a Node version in the `validate` matrix never requires
+  # touching the ruleset's required-checks list -- only this job's
+  # `needs:` array changes. `needs: [validate]` alone already waits for
+  # every matrix leg (GitHub Actions requires all instances of a matrix
+  # job to complete before a dependent job runs), so the legs are not
+  # enumerated individually here.
+  ci-required:
+    runs-on: ubuntu-latest
+    if: always()
+    needs: [validate, audit, sbom]
+    steps:
+      - name: Verify every required job succeeded
+        run: |
+          for result in \
+            "${{ needs.validate.result }}" \
+            "${{ needs.audit.result }}" \
+            "${{ needs.sbom.result }}"; do
+            if [ "$result" != "success" ]; then
+              echo "::error::at least one required job did not succeed"
+              exit 1
+            fi
+          done
+          echo "All required CI jobs passed."
